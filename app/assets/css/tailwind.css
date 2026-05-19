@@ -56,15 +56,6 @@
     scrollbar-width: none;
     @apply overscroll-none;
   }
-
-  body {
-    @media (width <= 28rem) {
-      background-image: url('/sign-in.png');
-      background-size: cover;
-      background-position: top right;
-      background-repeat: no-repeat;
-    }
-  }
 }
 
 @layer components {

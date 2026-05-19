@@ -15,12 +15,14 @@ onBeforeMount(() => {
           alt="L'Oréal-ONESINGAPORE"
           width="88"
           height="26"
+          preload
         />
         <NuxtImg
           src="/AmplifAI-logo.svg"
           alt="AmplifAI"
           width="97"
           height="22"
+          preload
         />
       </GlassPanel>
     </AppTopBar>
@@ -37,6 +39,7 @@ onBeforeMount(() => {
         <NuxtImg
           src="/slash-date-panel.png"
           alt="Date"
+          preload
           class="w-46"
         />
         <div class="absolute inset-0 grid place-content-center text-[20px] leading-[24px] font-sans font-normal text-center pt-1 pl-3 pr-5 pb-4">
@@ -45,7 +48,7 @@ onBeforeMount(() => {
         </div>
       </div>
 
-      <AppBottomBar class="mt-16 pb-4! space-y-4">
+      <AppBottomBar class="mt-[min(4rem,20dvh)] pb-4! space-y-4">
         <NuxtLink
           href="/sign-in"
           prefetch
