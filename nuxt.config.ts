@@ -64,6 +64,9 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+      ],
       meta: [
         { name: 'theme-color', content: '#0021A5' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
