@@ -1,0 +1,9 @@
+{
+  "name": "AmplifAI",
+  "short_name": "AmplifAI",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#141416",
+  "theme_color": "#0021A5"
+}

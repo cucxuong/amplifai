@@ -1,9 +1,11 @@
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<{
     as?: 'div' | 'button'
     deg?: number
-    class?: string
+    class?: ClassValue
   }>(),
   {
     as: 'div',
@@ -16,7 +18,8 @@ const props = withDefaults(
 <template>
   <component
     :is="props.as"
-    :class="['glass-panel', props.class]"
+    v-bind="$attrs"
+    :class="cn('glass-panel', props.class)"
     :style="{ '--light-deg': `${props.deg}deg` }"
   >
     <slot />

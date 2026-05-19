@@ -1,23 +1,26 @@
 <script setup lang="ts">
-/** Matches initial “peek” offset; user cannot scroll above this. */
-const MIN_SCROLL_TOP = 60
+const APP_MIN_SCROLL_TOP_VAR = '--app-min-scroll-top'
 
-function clampScrollTop() {
-  if (window.scrollY !== MIN_SCROLL_TOP)
-    window.scrollTo({ top: MIN_SCROLL_TOP, left: 0, behavior: 'instant' })
-}
+const minScrollTopRaw = useCssVar(APP_MIN_SCROLL_TOP_VAR)
 
-onMounted(() => {
-  window.scrollTo({ top: MIN_SCROLL_TOP, left: 0, behavior: 'instant' })
-  useEventListener(window, 'scroll', clampScrollTop, { passive: true })
-})
+const minScrollTop = computed(
+  () => Number.parseFloat(minScrollTopRaw.value ?? '62') || 62,
+)
+
+const { y: scrollY } = useWindowScroll({ behavior: 'instant' })
+
+useBlockUserWindowScroll()
+usePortraitOrientationLock()
+
+/** Programmatic peek offset only; user scroll blocked on html/body. */
+watch(() => scrollY.value !== minScrollTop.value, (y) => {
+  if (y)
+    scrollY.value = minScrollTop.value
+}, { immediate: true })
 </script>
 
 <template>
-  <div
-    class="pt-(--app-min-scroll-top) pb-25 w-dvw max-w-md mx-auto"
-    :style="{ '--app-min-scroll-top': `${MIN_SCROLL_TOP}px`}"
-  >
+  <div class="pt-(--app-min-scroll-top) pb-25 w-dvw max-w-md mx-auto">
     <NuxtPage />
   </div>
 </template>

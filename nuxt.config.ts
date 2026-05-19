@@ -1,16 +1,9 @@
-import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
-
-import { createResolver } from "nuxt/kit"
+import { createResolver } from 'nuxt/kit'
 
 const { resolve } = createResolver(import.meta.url)
 
-/** Paths under `app/assets/fonts/Loreal Fonts/Fonts/` */
-const lorealFontRoot = new URL('./app/assets/fonts/Loreal Fonts/Fonts/', import.meta.url)
-
-function lorealFontPath(rel: string) {
-  return fileURLToPath(new URL(rel, lorealFontRoot))
-}
+const lorealFontsDir = './app/assets/fonts/Loreal'
 
 // One entry per file: same `name` repeats for multiple @font-face of one CSS family.
 const lorealFontFiles = [
@@ -35,14 +28,32 @@ const lorealFamilies = lorealFontFiles.map(({ name, rel, format, weight, style }
   global: true,
   weight,
   style,
-  src: [{ url: lorealFontPath(rel), format }],
+  src: [{ url: resolve(lorealFontsDir, rel), format }],
 }))
 
+
+const isProduction = process.env.NODE_ENV === 'production'
+const sessionCookieSecure
+  = process.env.NUXT_SESSION_COOKIE_SECURE === 'true'
+    ? true
+    : process.env.NUXT_SESSION_COOKIE_SECURE === 'false'
+      ? false
+      : isProduction
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  devtools: { enabled: false },
+
+  runtimeConfig: {
+    session: {
+      cookie: {
+        secure: sessionCookieSecure,
+        sameSite: 'lax',
+        httpOnly: true,
+      },
+    },
+  },
 
   experimental: {
     viewTransition: true,
@@ -61,7 +72,8 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/color-mode',
     '@pinia/nuxt',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
+    'nuxt-auth-utils',
   ],
 
   css: ['./app/assets/css/tailwind.css'],
@@ -70,6 +82,7 @@ export default defineNuxtConfig({
     head: {
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'manifest', href: '/manifest.webmanifest' },
       ],
       meta: [
         { name: 'theme-color', content: '#0021A5' },

@@ -9,6 +9,10 @@
   --text-base--line-height: 1.25;
   --text-base--font-weight: 400;
 
+  --text-title: 1.5rem;
+  --text-title--line-height: 2rem;
+  --text-title--font-weight: 700;
+
   --text-heading: 2rem;
   --text-heading--line-height: 1.125;
   --text-heading--font-weight: 700;
@@ -19,26 +23,23 @@
 }
 
 @theme inline {
-  --color-surface: var(--clr-surface);
-  --color-primary: var(--clr-primary);
-  --color-secondary: var(--clr-secondary);
-  --color-tertiary: var(--clr-tertiary);
-  --color-subtle: var(--clr-subtle);
+  --color-brand: #0021A5;
+  --color-surface: #141416;
+  --color-primary: #F3F4F6;
+  --color-secondary: #E5E7EB;
+  --color-tertiary: #D2D5DA;
+  --color-subtle: #9CA3AF;
+  --color-muted: #E5E7EB;
 }
 
 @layer base {
   :root {
-    /* --clr-surface: #0021A5; */
-    --clr-surface: #141416;
-    --clr-primary: #F3F4F6;
-    --clr-secondary: #E5E7EB;
-    --clr-tertiary: #D2D5DA;
-    --clr-subtle: #9CA3AF;
-
     --app-top-offset: env(safe-area-inset-top, 0px);
     --app-left-offset: env(safe-area-inset-left, 0px);
     --app-right-offset: env(safe-area-inset-right, 0px);
     --app-bottom-offset: env(safe-area-inset-bottom, 0px);
+
+    --app-min-scroll-top: 62px;
   }
 
 
@@ -54,16 +55,26 @@
     min-height: 100dvh;
     scrollbar-color: transparent;
     scrollbar-width: none;
+    transition: background-image 0.2s ease-in-out, background-position 0.3s ease-in-out;
     @apply overscroll-none select-none;
   }
 
-  body:has(.sign-in-page) {
+  body,
+  body:has(#sign-in-page) {
     background-image: url('/sign-in.png');
     background-size: cover;
     background-position: 30% 0%;
     background-repeat: no-repeat;
   }
-  body:has(.slash-page) {
+
+  body:has(#pick-persona-page) {
+    background-image: url('/pick-persona.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  body:has(#slash-page) {
     background-image: url('/slash.png');
     background-size: cover;
     background-position: top right;
@@ -81,6 +92,7 @@
     &::view-transition-old(root) {
       animation: fade-out 0.3s ease-in-out;
     }
+
     &::view-transition-new(root) {
       animation: slide-in-right 0.3s ease-in-out;
     }
@@ -91,6 +103,7 @@
     &::view-transition-old(root) {
       animation: slide-out-right 0.3s ease-in-out;
     }
+
     &::view-transition-new(root) {
       animation: fade-in 0.3s ease-in-out;
     }
@@ -101,18 +114,21 @@
       opacity: 1;
       scale: 1;
     }
+
     to {
       opacity: 0;
       transform: translateX(-10%);
       scale: 0.95;
     }
   }
+
   @keyframes fade-in {
     from {
       opacity: 0;
       transform: translateX(-10%);
       scale: 0.95;
     }
+
     to {
       opacity: 1;
       scale: 1;
@@ -123,30 +139,37 @@
     from {
       transform: translateX(0);
     }
+
     to {
       transform: translateX(-100%);
     }
   }
+
   @keyframes slide-in-right {
     from {
       transform: translateX(100%);
     }
+
     to {
       transform: translateX(0);
     }
   }
+
   @keyframes slide-out-right {
     from {
       transform: translateX(0);
     }
+
     to {
       transform: translateX(100%);
     }
   }
+
   @keyframes slide-in-left {
     from {
       transform: translateX(-100%);
     }
+
     to {
       transform: translateX(0);
     }
@@ -155,7 +178,6 @@
 
 @layer components {
   .glass-panel {
-    --light-deg: -10deg;
     @apply rounded-[20px] backdrop-blur-xs relative transition-all;
     box-shadow: 0 4px 20px 0 rgba(0, 87, 255, 0.50) inset, 0 -4px 20px 0 rgba(255, 110, 0, 0.20) inset;
 
@@ -163,23 +185,28 @@
       content: '';
       @apply absolute inset-0 -z-1 transition-all;
       border-radius: inherit;
-      background: linear-gradient(var(--light-deg), hsl(0 0 100 / 35%), transparent, hsl(0 0 100 / 35%)) border-box;
+      background: linear-gradient(var(--light-deg), var(--glass-border-one), transparent, var(--glass-border-two)) border-box;
       border: 1px solid transparent;
       mask: linear-gradient(black, black) border-box, linear-gradient(black, black) padding-box;
       mask-composite: subtract;
     }
   }
 
-  /* .slash-page {
-    background-image: url('/slash.png');
-    background-size: cover;
-    background-position: top right;
-    background-repeat: no-repeat;
+  @property --light-deg {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: -10deg;
   }
-  .sign-in-page {
-    background-image: url('/sign-in.png');
-    background-size: cover;
-    background-position: 30% 0%;
-    background-repeat: no-repeat;
-  } */
+
+  @property --glass-border-one {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: hsl(0 0 100 / 35%);
+  }
+
+  @property --glass-border-two {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: hsl(0 0 100 / 35%);
+  }
 }
