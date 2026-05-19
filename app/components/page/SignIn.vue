@@ -1,13 +1,8 @@
 <script setup lang="ts">
-const appStyles = inject('appStyles', ref({}))
+const appClass = inject('appClass', ref(''))
 
 onBeforeMount(() => {
-  appStyles.value = {
-    backgroundImage: 'url(/sign-in.png)',
-    backgroundSize: 'cover',
-    backgroundPosition: '30% 0%',
-    backgroundRepeat: 'no-repeat',
-  }
+  appClass.value = 'sign-in-page'
 })
 </script>
 
@@ -16,6 +11,7 @@ onBeforeMount(() => {
     <AppTopBar>
       <NuxtLink
         href="/"
+        prefetch
         class="outline-none! size-11 shrink-0 rounded-4xl p-0 glass-panel [--light-deg:-45deg] bg-primary/5 grid place-content-center active:scale-110 select-none"
       >
         <Icon

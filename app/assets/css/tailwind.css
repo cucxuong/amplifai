@@ -83,4 +83,17 @@
       mask-composite: subtract;
     }
   }
+
+  .slash-page {
+    background-image: url('slash.png');
+    background-size: cover;
+    background-position: top right;
+    background-repeat: no-repeat;
+  }
+  .sign-in-page {
+    background-image: url('sign-in.png');
+    background-size: cover;
+    background-position: 30% 0%;
+    background-repeat: no-repeat;
+  }
 }

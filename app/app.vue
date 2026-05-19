@@ -13,13 +13,16 @@ onMounted(() => {
 })
 
 const appStyles = ref({})
+const appClass = ref('')
 
 provide('appStyles', appStyles)
+provide('appClass', appClass)
 </script>
 
 <template>
   <div
     class="pt-15 pb-25 w-dvw max-w-md mx-auto"
+    :class="appClass"
     :style="{ '--app-min-scroll-top': `${MIN_SCROLL_TOP}px`, ...appStyles}"
   >
     <NuxtPage />

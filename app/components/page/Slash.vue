@@ -1,13 +1,8 @@
 <script setup lang="ts">
-const appStyles = inject('appStyles', ref({}))
+const appClass = inject('appClass', ref(''))
 
 onBeforeMount(() => {
-  appStyles.value = {
-    backgroundImage: 'url(/slash.png)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'top right',
-    backgroundRepeat: 'no-repeat',
-  }
+  appClass.value = 'slash-page'
 })
 </script>
 
