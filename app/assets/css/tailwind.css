@@ -58,10 +58,12 @@
   }
 
   body {
-    background-image: url('sign-in.png');
-    background-size: cover;
-    background-position: 30% 0%;
-    background-repeat: no-repeat;
+    @media (width <= 28rem) {
+      background-image: url('sign-in.png');
+      background-size: cover;
+      background-position: 30% 0%;
+      background-repeat: no-repeat;
+    }
   }
 }
 

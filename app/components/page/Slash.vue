@@ -42,8 +42,7 @@ onBeforeMount(() => {
         <NuxtImg
           src="/slash-date-panel.png"
           alt="Date"
-          width="164"
-          height="79"
+          class="w-46"
         />
         <div class="absolute inset-0 grid place-content-center text-[20px] leading-[24px] font-sans font-normal text-center pt-1 pl-3 pr-5 pb-4">
           02 - 05 June <br>
@@ -54,6 +53,7 @@ onBeforeMount(() => {
       <AppBottomBar class="mt-16 pb-4! space-y-4">
         <NuxtLink
           href="/sign-in"
+          prefetch
           class="flex justify-center w-full outline-none! p-5 py-3.5 rounded-[20px] font-bold leading-[24px] active:scale-[1.015] select-none transition-all"
           style="background: linear-gradient(135deg, #FF6E00 0%, #FF003B 100%);"
         >
