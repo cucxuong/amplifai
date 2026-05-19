@@ -54,7 +54,7 @@
     min-height: 100dvh;
     scrollbar-color: transparent;
     scrollbar-width: none;
-    @apply overscroll-none;
+    @apply overscroll-none select-none;
   }
 
   body:has(.sign-in-page) {
