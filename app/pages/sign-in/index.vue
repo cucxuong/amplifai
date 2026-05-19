@@ -2,7 +2,7 @@
 definePageMeta({
   viewTransition: {
     enabled: true,
-    types: ['fade'],
+    types: ['slide'],
     toTypes: ['slide-in'],
     fromTypes: ['slide-out'],
   },

@@ -11,19 +11,12 @@ onMounted(() => {
   window.scrollTo({ top: MIN_SCROLL_TOP, left: 0, behavior: 'instant' })
   useEventListener(window, 'scroll', clampScrollTop, { passive: true })
 })
-
-const appStyles = ref({})
-const appClass = ref('')
-
-provide('appStyles', appStyles)
-provide('appClass', appClass)
 </script>
 
 <template>
   <div
-    class="pt-15 pb-25 w-dvw max-w-md mx-auto"
-    :class="appClass"
-    :style="{ '--app-min-scroll-top': `${MIN_SCROLL_TOP}px`, ...appStyles}"
+    class="pt-(--app-min-scroll-top) pb-25 w-dvw max-w-md mx-auto"
+    :style="{ '--app-min-scroll-top': `${MIN_SCROLL_TOP}px`}"
   >
     <NuxtPage />
   </div>

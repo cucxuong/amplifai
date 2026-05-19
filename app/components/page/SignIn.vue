@@ -1,13 +1,5 @@
-<script setup lang="ts">
-const appClass = inject('appClass', ref(''))
-
-onBeforeMount(() => {
-  appClass.value = 'sign-in-page'
-})
-</script>
-
 <template>
-  <div class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]">
+  <div class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto] sign-in-page">
     <AppTopBar>
       <NuxtLink
         href="/"

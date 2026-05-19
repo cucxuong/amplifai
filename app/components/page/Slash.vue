@@ -1,13 +1,5 @@
-<script setup lang="ts">
-const appClass = inject('appClass', ref(''))
-
-onBeforeMount(() => {
-  appClass.value = 'slash-page'
-})
-</script>
-
 <template>
-  <div class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]">
+  <div class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto] slash-page">
     <AppTopBar>
       <GlassPanel class="bg-[hsl(233_81%_10%/0.4)] p-4 px-5 flex items-center justify-between gap-4">
         <NuxtImg
@@ -31,7 +23,7 @@ onBeforeMount(() => {
         <NuxtImg
           src="/AmplifAI-logo.svg"
           alt="AmplifAI"
-          class="w-[80dvw]"
+          class="w-[min(22rem,80dvw)]"
         />
         <div class="text-[20px] leading-[24px] font-sans font-normal">Powered by Tech & Data</div>
       </div>

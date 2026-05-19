@@ -57,6 +57,19 @@
     @apply overscroll-none;
   }
 
+  body:has(.sign-in-page) {
+    background-image: url('/sign-in.png');
+    background-size: cover;
+    background-position: 30% 0%;
+    background-repeat: no-repeat;
+  }
+  body:has(.slash-page) {
+    background-image: url('/slash.png');
+    background-size: cover;
+    background-position: top right;
+    background-repeat: no-repeat;
+  }
+
   /* Default crossfade */
   ::view-transition-old(root),
   ::view-transition-new(root) {
@@ -157,7 +170,7 @@
     }
   }
 
-  .slash-page {
+  /* .slash-page {
     background-image: url('/slash.png');
     background-size: cover;
     background-position: top right;
@@ -168,5 +181,5 @@
     background-size: cover;
     background-position: 30% 0%;
     background-repeat: no-repeat;
-  }
+  } */
 }
