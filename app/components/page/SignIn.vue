@@ -15,7 +15,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="pt-15 pb-25 w-dvw"
+    class="pt-15 pb-25 w-dvw max-w-md mx-auto"
     style="background: url('/sign-in.png') no-repeat; background-size: cover; background-position: 30% 0%;"
   >
     <div
