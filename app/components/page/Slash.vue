@@ -29,7 +29,7 @@ onBeforeMount(() => {
         />
       </GlassPanel>
     </AppTopBar>
-    <main class="flex flex-col justify-end pt-[50dvh]">
+    <main class="flex flex-col justify-end pt-[calc(50dvh+var(--app-min-scroll-top))]">
       <div class="flex flex-col items-center gap-2">
         <NuxtImg
           src="/AmplifAI-logo.svg"
@@ -51,7 +51,7 @@ onBeforeMount(() => {
         </div>
       </div>
 
-      <AppBottomBar class="mt-16 space-y-4">
+      <AppBottomBar class="mt-16 pb-4! space-y-4">
         <NuxtLink
           href="/sign-in"
           class="flex justify-center w-full outline-none! p-5 py-3.5 rounded-[20px] font-bold leading-[24px] active:scale-[1.015] select-none transition-all"
