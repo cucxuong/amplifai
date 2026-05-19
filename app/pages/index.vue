@@ -1,3 +1,3 @@
 <template>
-  <PageSignIn />
+  <PageSlash />
 </template>

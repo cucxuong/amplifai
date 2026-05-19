@@ -11,12 +11,16 @@ onMounted(() => {
   window.scrollTo({ top: MIN_SCROLL_TOP, left: 0, behavior: 'instant' })
   useEventListener(window, 'scroll', clampScrollTop, { passive: true })
 })
+
+const appStyles = ref({})
+
+provide('appStyles', appStyles)
 </script>
 
 <template>
   <div
     class="pt-15 pb-25 w-dvw max-w-md mx-auto"
-    style="background: url('/sign-in.png') no-repeat; background-size: cover; background-position: 30% 0%;"
+    :style="appStyles"
   >
     <NuxtPage />
   </div>

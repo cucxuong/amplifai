@@ -1,12 +1,28 @@
+<script setup lang="ts">
+const appStyles = inject('appStyles', ref({}))
+
+onBeforeMount(() => {
+  appStyles.value = {
+    backgroundImage: 'url(/sign-in.png)',
+    backgroundSize: 'cover',
+    backgroundPosition: '30% 0%',
+    backgroundRepeat: 'no-repeat',
+  }
+})
+</script>
+
 <template>
   <div class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]">
     <AppTopBar>
-      <button class="outline-none! size-11 shrink-0 rounded-4xl p-0 glass-panel [--light-deg:-45deg] bg-primary/5 grid place-content-center active:scale-110 select-none">
+      <NuxtLink
+        href="/"
+        class="outline-none! size-11 shrink-0 rounded-4xl p-0 glass-panel [--light-deg:-45deg] bg-primary/5 grid place-content-center active:scale-110 select-none"
+      >
         <Icon
           name="amplif:arrow-left"
           :size="24"
         />
-      </button>
+      </NuxtLink>
     </AppTopBar>
     <main class="space-y-9 p-4 py-5">
       <div class="space-y-2">
