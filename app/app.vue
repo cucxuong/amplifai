@@ -20,7 +20,7 @@ provide('appStyles', appStyles)
 <template>
   <div
     class="pt-15 pb-25 w-dvw max-w-md mx-auto"
-    :style="appStyles"
+    :style="{ '--app-min-scroll-top': `${MIN_SCROLL_TOP}px`, ...appStyles}"
   >
     <NuxtPage />
   </div>
