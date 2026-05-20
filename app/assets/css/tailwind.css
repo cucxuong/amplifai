@@ -17,6 +17,10 @@
   --text-heading--line-height: 1.125;
   --text-heading--font-weight: 700;
 
+  --text-label: 14px;
+  --text-label--line-height: 18px;
+  --text-label--font-weight: 700;
+
   --text-caption: 0.75rem;
   --text-caption--line-height: 1rem;
   --text-caption--font-weight: 400;
