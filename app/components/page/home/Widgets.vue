@@ -34,6 +34,7 @@ const props = defineProps<{
     <GlassPanel
       class="p-2 py-2.5 flex items-center gap-0.5"
       style="background: linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)), rgb(255 255 255 / 0.1);"
+      @click="navigateTo('/leader-board')"
     >
       <NuxtImg
         src="/star.png"

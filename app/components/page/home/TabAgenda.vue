@@ -11,11 +11,11 @@ const AGENDA_DAYS = [
 
 const activeDate = ref<string>(AGENDA_DAYS[0].day)
 
-const store = useAgendaStore()
+const { agendaItemsForView } = useAgendaSchedule()
 
 const agendaItems = computed(() => {
   const date = activeDate.value === 'ALWAYS ON BOOTH' ? null : AGENDA_DAYS.find(day => day.day === activeDate.value)?.date
-  return store.itemsForView(activeAgendaTab.value, date ?? null)
+  return agendaItemsForView(activeAgendaTab.value, date ?? null)
 })
 </script>
 <template>
@@ -49,7 +49,7 @@ const agendaItems = computed(() => {
         </GlassPanel>
       </div>
 
-      <div class="bg-primary p-4 py-5 rounded-[28px] gap-7 flex flex-col">
+      <div class="bg-white p-4 py-5 rounded-[28px] gap-7 flex flex-col">
         <div class="flex *:flex-1 gap-2.5">
           <button
             v-for="day in AGENDA_DAYS"

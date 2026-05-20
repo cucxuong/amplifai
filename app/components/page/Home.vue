@@ -2,6 +2,7 @@
 const { clear } = useUserSession()
 
 async function signOut() {
+  useCurrentUserStore().clearSchedule()
   await clear()
   await navigateTo('/')
 }

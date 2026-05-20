@@ -19,9 +19,12 @@ export interface PageBackgroundState {
   onboardingComplete: boolean
 }
 
-export interface PageBackgroundConfig {
-  src: PageBackgroundSource
-}
+export const LEADER_BOARD_BACKGROUND =
+  'linear-gradient(180deg, #000 0%, #0021A5 100%)'
+
+export type PageBackgroundConfig =
+  | { kind: 'image'; src: PageBackgroundSource }
+  | { kind: 'gradient'; background: string }
 
 export type PageBackgroundUrlBuilder = (
   src: PageBackgroundSource,
@@ -40,13 +43,15 @@ export function resolvePageBackground(
   routePath: string,
   state: PageBackgroundState,
 ): PageBackgroundConfig {
+  if (routePath.startsWith('/leader-board'))
+    return { kind: 'gradient', background: LEADER_BOARD_BACKGROUND }
   if (routePath.startsWith('/sign-in'))
-    return { src: '/sign-in.png' }
+    return { kind: 'image', src: '/sign-in.png' }
   if (!state.loggedIn)
-    return { src: '/slash.png' }
+    return { kind: 'image', src: '/slash.png' }
   if (!state.onboardingComplete)
-    return { src: '/pick-persona.png' }
-  return { src: '/sign-in.png' }
+    return { kind: 'image', src: '/pick-persona.png' }
+  return { kind: 'image', src: '/sign-in.png' }
 }
 
 /** Backgrounds likely needed on the next navigation or session transition. */
@@ -54,6 +59,8 @@ export function getLikelyNextPageBackgroundSrcs(
   routePath: string,
   state: PageBackgroundState,
 ): PageBackgroundSource[] {
+  if (routePath.startsWith('/leader-board'))
+    return ['/sign-in.png']
   if (routePath.startsWith('/sign-in'))
     return ['/pick-persona.png', '/sign-in.png']
   if (!state.loggedIn)
