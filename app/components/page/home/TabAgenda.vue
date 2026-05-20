@@ -15,7 +15,7 @@ const { agendaItemsForView } = useAgendaSchedule()
 
 const agendaItems = computed(() => {
   const date = activeDate.value === 'ALWAYS ON BOOTH' ? null : AGENDA_DAYS.find(day => day.day === activeDate.value)?.date
-  return agendaItemsForView(activeAgendaTab.value, date ?? null)
+  return agendaItemsForView(activeAgendaTab.value, date ?? null) ?? []
 })
 </script>
 <template>

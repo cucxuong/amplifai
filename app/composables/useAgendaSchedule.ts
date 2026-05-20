@@ -5,6 +5,8 @@ export function useAgendaSchedule() {
   const agenda = useAgendaStore()
   const currentUser = useCurrentUserStore()
 
+  currentUser.seedScheduleFromAgenda(agenda.items)
+
   onMounted(() => currentUser.syncFromSession())
 
   function isInUserCalendar(itemOrId: AgendaItem | string): boolean {

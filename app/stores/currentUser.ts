@@ -35,6 +35,16 @@ export const useCurrentUserStore = defineStore('currentUser', () => {
     scheduleIds.value = []
   }
 
+  /** One-time seed from mock agenda data (`inMySchedule` on items). */
+  function seedScheduleFromAgenda(items: { id: string; inMySchedule?: boolean }[]) {
+    if (scheduleIds.value.length > 0)
+      return
+    for (const item of items) {
+      if (item.inMySchedule)
+        addToSchedule(item.id)
+    }
+  }
+
   const scheduleCount = computed(() => scheduleIds.value.length)
 
   return {
@@ -48,6 +58,7 @@ export const useCurrentUserStore = defineStore('currentUser', () => {
     removeFromSchedule,
     toggleSchedule,
     clearSchedule,
+    seedScheduleFromAgenda,
     scheduleCount,
   }
 })

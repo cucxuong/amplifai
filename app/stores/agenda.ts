@@ -19,6 +19,8 @@ export interface AgendaItem {
   locationDetail?: string;
   /** Always-on booth tab; still single-day `startAt` / `endAt` */
   alwaysOn?: boolean;
+  /** Mock seed only; runtime schedule lives in useCurrentUserStore */
+  inMySchedule?: boolean;
 }
 
 export function isAlwaysOnItem(item: AgendaItem) {
@@ -376,11 +378,6 @@ export const useAgendaStore = defineStore("agenda", () => {
     },
   ]);
 
-  function toggleSchedule(id: string) {
-    const item = items.value.find((i) => i.id === id);
-    if (item) item.inMySchedule = !item.inMySchedule;
-  }
-
   function itemsByDate(date: string | null) {
     if (date === null) return items.value.filter(isAlwaysOnItem);
     return items.value.filter((i) => !isAlwaysOnItem(i) && itemOnDate(i, date));
@@ -389,9 +386,6 @@ export const useAgendaStore = defineStore("agenda", () => {
   return {
     items,
     itemsByDate,
-    scheduledItems,
-    itemsForView,
-    toggleSchedule,
     isAgendaItemLive,
     isAlwaysOnItem,
     itemOnDate,

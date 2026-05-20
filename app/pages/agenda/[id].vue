@@ -2,6 +2,7 @@
 const route = useRoute();
 const router = useRouter();
 const store = useAgendaStore();
+const { isInUserCalendar, toggleSchedule: toggleUserSchedule } = useAgendaSchedule();
 
 const item = computed(() =>
   store.items.find((i) => i.id === (route.params.id as string)),
@@ -36,7 +37,9 @@ const formattedDay = useDateFormat(startDate, "dddd, MMMM D");
 const formattedStart = useDateFormat(startDate, "h:mm A");
 const formattedEnd = useDateFormat(endDate, "h:mm A");
 
-const isInMySchedule = computed(() => item.value?.inMySchedule ?? false);
+const isInMySchedule = computed(() =>
+  item.value ? isInUserCalendar(item.value) : false,
+);
 
 function goBack() {
   if (window.history.length > 1) router.back();
@@ -44,7 +47,7 @@ function goBack() {
 }
 
 function toggleSchedule() {
-  if (item.value) store.toggleSchedule(item.value.id);
+  if (item.value) toggleUserSchedule(item.value.id);
 }
 </script>
 
