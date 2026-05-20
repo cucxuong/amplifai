@@ -6,25 +6,30 @@ const props = defineProps<{
 
 <template>
   <div class="p-4 pb-5 grid grid-cols-2 gap-3">
-    <GlassPanel
-      class="p-2 py-2.5 flex items-center gap-0.5"
-      style="background: linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)), rgb(255 255 255 / 0.1);"
+    <NuxtLink
+      href="/sparks"
+      class="block"
     >
-      <NuxtImg
-        src="/star-four.png"
-        class="size-9 object-cover"
-      />
-      <div class="flex flex-col gap-1.5 flex-1">
-        <span class="text-[11px] leading-[14px] text-secondary uppercase">SPARK SCORE</span>
-        <span><span class="text-[24px] leading-[28px] font-bold">180</span><span class="leading-[28px] text-secondary">/240</span></span>
-      </div>
-      <GlassPanel class="appearance-none outline-none! size-7 rounded-4xl p-0 [--light-deg:-45deg] bg-primary/20 grid place-content-center active:scale-110 select-none mb-auto">
-        <Icon
-          name="amplif:arrow-up-right"
-          :size="12"
+      <GlassPanel
+        class="p-2 py-2.5 flex items-center gap-0.5 active:scale-[1.03] transition-all"
+        style="background: linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)), rgb(255 255 255 / 0.1);"
+      >
+        <NuxtImg
+          src="/star-four.png"
+          class="size-9 object-cover"
         />
+        <div class="flex flex-col gap-1.5 flex-1">
+          <span class="text-[11px] leading-[14px] text-secondary uppercase">SPARK SCORE</span>
+          <span><span class="text-[24px] leading-[28px] font-bold">180</span><span class="leading-[28px] text-secondary">/240</span></span>
+        </div>
+        <GlassPanel class="appearance-none outline-none! size-7 rounded-4xl p-0 [--light-deg:-45deg] bg-primary/20 grid place-content-center select-none mb-auto">
+          <Icon
+            name="amplif:arrow-up-right"
+            :size="12"
+          />
+        </GlassPanel>
       </GlassPanel>
-    </GlassPanel>
+    </NuxtLink>
 
     <GlassPanel
       class="p-2 py-2.5 flex items-center gap-0.5"
