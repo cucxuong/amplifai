@@ -24,4 +24,8 @@ logs
 .env.*
 !.env.example
 
+# mkcert dev TLS (NUXT_DEV_HTTPS_KEY / NUXT_DEV_HTTPS_CERT)
+.cert/
+*.pem
+
 .vercel

@@ -1,5 +1,13 @@
 <script setup lang="ts">
 const { activeTab, APP_NAV_ITEMS } = useHomeNav()
+
+function selectNav(name: AppNav) {
+  if (name === AppNav.SCAN) {
+    navigateTo('/scan')
+    return
+  }
+  activeTab.value = name
+}
 </script>
 
 <template>
@@ -13,7 +21,7 @@ const { activeTab, APP_NAV_ITEMS } = useHomeNav()
       class="appearance-none outline-none! flex flex-col items-center justify-center gap-1 rounded-full p-2 pb-1.5 capitalize text-caption leading-[14px] font-bold"
       :class="activeTab === item.name ? 'glass-panel' : 'text-primary/50'"
       :style="activeTab === item.name ? { background: 'linear-gradient(0deg, rgba(5, 10, 48, 0.90) 0%, rgba(5, 10, 48, 0.90) 100%), rgba(255, 255, 255, 0.50)' } : ''"
-      @click="activeTab = item.name"
+      @click="selectNav(item.name)"
     >
       <Icon
         :name="item.icon"

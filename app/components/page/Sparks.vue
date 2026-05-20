@@ -81,7 +81,7 @@ const maxScore = 240;
           class="size-6 object-contain"
         />
         <span
-          class="text-caption uppercase tracking-wide font-[900] text-[14px]"
+          class="text-caption uppercase tracking-wide font-black text-[14px]"
         >Rank #14</span>
       </div>
 
@@ -106,7 +106,7 @@ const maxScore = 240;
         >/{{ maxScore }}</span>
         <NuxtImg
           src="/activity-star.png"
-          class="size-10 object-cover flex-shrink-0"
+          class="size-10 object-cover shrink-0"
         />
       </div>
 
@@ -126,11 +126,11 @@ const maxScore = 240;
         <div
           v-for="item in activities"
           :key="item.id"
-          class="flex items-center gap-3 py-4 border-b border-[#F3F4F6] last:border-0"
+          class="flex items-center gap-3 py-4 border-b border-primary/10 last:border-0"
         >
           <!-- Icon -->
           <div
-            class="size-11 rounded-full flex-shrink-0 grid place-content-center"
+            class="size-11 rounded-full shrink-0 grid place-content-center"
             style="
               background: linear-gradient(135deg, #e8f0ff 0%, #c7daff 100%);
             "
@@ -155,7 +155,7 @@ const maxScore = 240;
           </div>
 
           <!-- Sparks delta -->
-          <div class="flex flex-col items-end flex-shrink-0 gap-0.5">
+          <div class="flex flex-col items-end shrink-0 gap-0.5">
             <!-- Positive: orange→red gradient; Negative: solid red -->
             <div
               v-if="item.sparks >= 0"
