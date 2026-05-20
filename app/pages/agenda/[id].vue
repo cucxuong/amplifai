@@ -51,26 +51,15 @@ function toggleSchedule() {
   if (item.value) toggleUserSchedule(item.value.id);
 }
 
-const showCheckin = ref(false);
-
 function handleCheckIn() {
   if (!item.value) return;
-  // Auto-save to schedule on check-in
-  if (!isInMySchedule.value) toggleUserSchedule(item.value.id);
-  showCheckin.value = true;
+  navigateTo(`/scan/${item.value.id}`);
 }
 </script>
 
 <template>
-  <!-- Check-in success: fully replaces the detail view -->
-  <PageAgendaCheckin
-    v-if="showCheckin && item"
-    :item="item"
-    @close="showCheckin = false"
-  />
-
   <div
-    v-else-if="item"
+    v-if="item"
     id="agenda-detail-page"
     class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
   >

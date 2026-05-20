@@ -1,7 +1,34 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import type { ServerOptions as HttpsServerOptions } from 'node:https'
+import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { createResolver } from 'nuxt/kit'
 
 const { resolve } = createResolver(import.meta.url)
+const rootDir = path.dirname(fileURLToPath(import.meta.url))
+const devCertDir = path.join(rootDir, '.cert')
+
+function devCertPaths() {
+  return {
+    key: process.env.NUXT_DEV_HTTPS_KEY ?? path.join(devCertDir, 'localhost-key.pem'),
+    cert: process.env.NUXT_DEV_HTTPS_CERT ?? path.join(devCertDir, 'localhost.pem'),
+  }
+}
+
+function hasDevCertFiles() {
+  const { key, cert } = devCertPaths()
+  return fs.existsSync(key) && fs.existsSync(cert)
+}
+
+/** mkcert files in .cert/ — see .env.example */
+function resolveDevHttps(): HttpsServerOptions {
+  const { key, cert } = devCertPaths()
+  return {
+    key: fs.readFileSync(key),
+    cert: fs.readFileSync(cert),
+  }
+}
 
 const lorealFontsDir = './app/assets/fonts/Loreal'
 
@@ -33,12 +60,13 @@ const lorealFamilies = lorealFontFiles.map(({ name, rel, format, weight, style }
 
 
 const isProduction = process.env.NODE_ENV === 'production'
+const devHttpsEnabled = !isProduction && process.env.NUXT_DEV_HTTPS !== 'false'
 const sessionCookieSecure
   = process.env.NUXT_SESSION_COOKIE_SECURE === 'true'
     ? true
     : process.env.NUXT_SESSION_COOKIE_SECURE === 'false'
       ? false
-      : isProduction
+      : isProduction || devHttpsEnabled
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -59,10 +87,15 @@ export default defineNuxtConfig({
     viewTransition: true,
   },
 
+  // HTTPS: use `npm run dev` (.cursor/scripts/dev-https.mjs → nuxt --https).
+  // mkcert files in .cert/ are passed via --https.key / --https.cert when present.
   vite: {
     plugins: [
       tailwindcss(),
     ],
+    ...(devHttpsEnabled && hasDevCertFiles()
+      ? { server: { https: resolveDevHttps() } }
+      : {}),
   },
 
   modules: [
@@ -85,7 +118,7 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: '/manifest.webmanifest' },
       ],
       meta: [
-        { name: 'theme-color', content: '#0021A5' },
+        { name: 'theme-color', content: '#000' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
       ],
     },

@@ -51,9 +51,12 @@ const maxScore = 240;
 </script>
 
 <template>
-  <div id="sparks-page" class="h-dvh flex flex-col">
+  <div
+    id="sparks-page"
+    class="h-dvh flex flex-col"
+  >
     <!-- Score header — sits on top of the body background image -->
-    <div class="flex flex-col flex-shrink-0 px-5 pb-8">
+    <div class="flex flex-col shrink-0 px-5 pb-8">
       <!-- Back button -->
       <AppTopBar class="px-0">
         <NuxtLink
@@ -61,7 +64,10 @@ const maxScore = 240;
           role="button"
           class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 glass-panel [--light-deg:-45deg] bg-primary/5 grid place-content-center active:scale-110 select-none"
         >
-          <Icon name="amplif:arrow-left" :size="24" />
+          <Icon
+            name="amplif:arrow-left"
+            :size="24"
+          />
         </NuxtLink>
       </AppTopBar>
 
@@ -70,11 +76,13 @@ const maxScore = 240;
         class="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-full mt-14 mb-5"
         style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
       >
-        <NuxtImg src="/rank-star.png" class="size-6 object-contain" />
+        <NuxtImg
+          src="/rank-star.png"
+          class="size-6 object-contain"
+        />
         <span
-          class="text-caption uppercase tracking-wide font-[900] text-[14px]"
-          >Rank #14</span
-        >
+          class="text-caption uppercase tracking-wide font-black text-[14px]"
+        >Rank #14</span>
       </div>
 
       <!-- Label -->
@@ -86,15 +94,19 @@ const maxScore = 240;
 
       <!-- Score number -->
       <div class="flex items-center gap-2 mb-2">
-        <span class="font-bold leading-none" style="font-size: 42px">{{
+        <span
+          class="font-bold leading-none"
+          style="font-size: 42px"
+        >{{
           currentScore
         }}</span>
-        <span class="text-secondary leading-none" style="font-size: 42px"
-          >/{{ maxScore }}</span
-        >
+        <span
+          class="text-secondary leading-none"
+          style="font-size: 42px"
+        >/{{ maxScore }}</span>
         <NuxtImg
           src="/activity-star.png"
-          class="size-10 object-cover flex-shrink-0"
+          class="size-10 object-cover shrink-0"
         />
       </div>
 
@@ -114,16 +126,19 @@ const maxScore = 240;
         <div
           v-for="item in activities"
           :key="item.id"
-          class="flex items-center gap-3 py-4 border-b border-[#F3F4F6] last:border-0"
+          class="flex items-center gap-3 py-4 border-b border-primary/10 last:border-0"
         >
           <!-- Icon -->
           <div
-            class="size-11 rounded-full flex-shrink-0 grid place-content-center"
+            class="size-11 rounded-full shrink-0 grid place-content-center"
             style="
               background: linear-gradient(135deg, #e8f0ff 0%, #c7daff 100%);
             "
           >
-            <NuxtImg src="/activity-star.png" class="size-10 object-cover" />
+            <NuxtImg
+              src="/activity-star.png"
+              class="size-10 object-cover"
+            />
           </div>
 
           <!-- Title + time -->
@@ -140,7 +155,7 @@ const maxScore = 240;
           </div>
 
           <!-- Sparks delta -->
-          <div class="flex flex-col items-end flex-shrink-0 gap-0.5">
+          <div class="flex flex-col items-end shrink-0 gap-0.5">
             <!-- Positive: orange→red gradient; Negative: solid red -->
             <div
               v-if="item.sparks >= 0"
@@ -153,14 +168,20 @@ const maxScore = 240;
               "
             >
               <span>+{{ item.sparks }}</span>
-              <Icon name="amplif:ai-colored" :size="14" />
+              <Icon
+                name="amplif:ai-colored"
+                :size="14"
+              />
             </div>
             <div
               v-else
               class="flex items-center gap-0.5 font-bold text-[14px] leading-[18px] text-[#FF003B]"
             >
               <span>{{ item.sparks }}</span>
-              <Icon name="amplif:ai-colored" :size="14" />
+              <Icon
+                name="amplif:ai-colored"
+                :size="14"
+              />
             </div>
             <span class="text-caption text-[#0B0F17]">Sparks</span>
           </div>

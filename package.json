@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev --host",
+    "dev": "node .cursor/scripts/dev-https.mjs",
+    "dev:http": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -20,6 +21,7 @@
     "@pinia/nuxt": "^0.11.3",
     "@tailwindcss/vite": "^4.3.0",
     "@vueuse/nuxt": "^14.3.0",
+    "@zxing/browser": "^0.2.0",
     "clsx": "^2.1.1",
     "eslint": "^9.39.4",
     "nuxt": "^4.4.5",

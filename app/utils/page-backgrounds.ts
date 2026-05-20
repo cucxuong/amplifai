@@ -22,6 +22,9 @@ export interface PageBackgroundState {
 export const LEADER_BOARD_BACKGROUND =
   'linear-gradient(180deg, #000 0%, #0021A5 100%)'
 
+/** Figma Scan QR code screen — full black body behind #scan-qr-page */
+export const SCAN_PAGE_BACKGROUND = '#000000'
+
 export type PageBackgroundConfig =
   | { kind: 'image'; src: PageBackgroundSource }
   | { kind: 'gradient'; background: string }
@@ -43,6 +46,8 @@ export function resolvePageBackground(
   routePath: string,
   state: PageBackgroundState,
 ): PageBackgroundConfig {
+  if (routePath.startsWith('/scan'))
+    return { kind: 'gradient', background: SCAN_PAGE_BACKGROUND }
   if (routePath.startsWith('/leader-board'))
     return { kind: 'gradient', background: LEADER_BOARD_BACKGROUND }
   if (routePath.startsWith('/sign-in'))
@@ -59,6 +64,8 @@ export function getLikelyNextPageBackgroundSrcs(
   routePath: string,
   state: PageBackgroundState,
 ): PageBackgroundSource[] {
+  if (routePath.startsWith('/scan'))
+    return []
   if (routePath.startsWith('/leader-board'))
     return ['/sign-in.png']
   if (routePath.startsWith('/sign-in'))
