@@ -5,7 +5,8 @@ const props = defineProps<{
 }>()
 </script>
 <template>
-  <div
+  <NuxtLink
+    :to="`/agenda/${props.agenda.id}`"
     class="col-span-full grid grid-cols-subgrid p-2.5 pr-3 rounded-[20px]"
     :class="'bg-muted text-surface'"
   >
@@ -45,5 +46,5 @@ const props = defineProps<{
       </div>
       <span class="text-caption leading-[14px]">Sparks</span>
     </div>
-  </div>
+  </NuxtLink>
 </template>
