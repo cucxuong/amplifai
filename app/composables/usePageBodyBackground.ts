@@ -28,9 +28,22 @@ export function usePageBodyBackground() {
 
   const bodyBackgroundStyle = computed(() => {
     const c = currentBackground.value
-    if (c.kind === 'gradient')
-      return `background: ${c.background};`
-    return `background-image: url('${currentImageUrl.value}');`
+    const base = [
+      'background-size: cover',
+      'background-repeat: no-repeat',
+    ]
+    if (c.kind === 'gradient') {
+      return [
+        ...base,
+        `background-image: ${c.background}`,
+        'background-position: center center',
+      ].join('; ')
+    }
+    return [
+      ...base,
+      `background-image: url('${currentImageUrl.value}')`,
+      'background-position: 30% 0%',
+    ].join('; ')
   })
 
   const likelyNextBackgroundUrls = computed(() =>
@@ -58,9 +71,16 @@ export function usePageBodyBackground() {
     }
   }
 
+  function applyBodyBackground() {
+    if (!import.meta.client)
+      return
+    document.body.setAttribute('style', bodyBackgroundStyle.value)
+  }
+
   useHead(computed(() => ({
     bodyAttrs: {
       style: bodyBackgroundStyle.value,
+      'data-page-bg': route.path,
     },
     link: [
       ...(currentImageUrl.value
@@ -81,7 +101,10 @@ export function usePageBodyBackground() {
     ],
   })))
 
+  watch(bodyBackgroundStyle, applyBodyBackground, { immediate: true })
+
   onMounted(() => {
+    applyBodyBackground()
     warmBackgrounds(allBackgroundUrls.value, currentImageUrl.value ?? undefined)
   })
 
