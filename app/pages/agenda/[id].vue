@@ -2,7 +2,8 @@
 const route = useRoute();
 const router = useRouter();
 const store = useAgendaStore();
-const { isInUserCalendar, toggleSchedule: toggleUserSchedule } = useAgendaSchedule();
+const { isInUserCalendar, toggleSchedule: toggleUserSchedule } =
+  useAgendaSchedule();
 
 const item = computed(() =>
   store.items.find((i) => i.id === (route.params.id as string)),
@@ -49,11 +50,27 @@ function goBack() {
 function toggleSchedule() {
   if (item.value) toggleUserSchedule(item.value.id);
 }
+
+const showCheckin = ref(false);
+
+function handleCheckIn() {
+  if (!item.value) return;
+  // Auto-save to schedule on check-in
+  if (!isInMySchedule.value) toggleUserSchedule(item.value.id);
+  showCheckin.value = true;
+}
 </script>
 
 <template>
+  <!-- Check-in success: fully replaces the detail view -->
+  <PageAgendaCheckin
+    v-if="showCheckin && item"
+    :item="item"
+    @close="showCheckin = false"
+  />
+
   <div
-    v-if="item"
+    v-else-if="item"
     id="agenda-detail-page"
     class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
   >
@@ -176,8 +193,9 @@ function toggleSchedule() {
     <AppBottomBar class="flex flex-col gap-3">
       <button
         type="button"
-        class="appearance-none outline-none! w-full py-3.5 rounded-[20px] font-bold leading-6 text-center active:scale-[1.015] transition-all select-none text-surface"
+        class="appearance-none outline-none! w-full py-3.5 rounded-[20px] font-bold leading-6 text-center active:scale-[1.015] transition-all select-none text-white"
         style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
+        @click="handleCheckIn"
       >
         Scan QR to check in
       </button>
