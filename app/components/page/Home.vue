@@ -1,22 +1,19 @@
 <script setup lang="ts">
-const { clear } = useUserSession()
+const { clear } = useUserSession();
 
 async function signOut() {
-  useCurrentUserStore().clearSchedule()
-  await clear()
-  await navigateTo('/')
+  useCurrentUserStore().clearSchedule();
+  await clear();
+  await navigateTo("/");
 }
 
-const { activeTab } = useHomeNav()
+const { activeTab } = useHomeNav();
 </script>
 
 <template>
-  <div
-    id="home-page"
-    class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
-  >
+  <div id="home-page" class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]">
     <AppTopBar class="p-5 py-6 h-auto">
-      <PageHomeUserSummary v-if="activeTab === AppNav.AGENDA"/>
+      <PageHomeUserSummary v-if="activeTab === AppNav.AGENDA" />
 
       <GlassPanel
         v-else
@@ -26,13 +23,10 @@ const { activeTab } = useHomeNav()
         class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
         @click="activeTab = AppNav.AGENDA"
       >
-        <Icon
-          name="amplif:arrow-left"
-          :size="24"
-        />
+        <Icon name="amplif:arrow-left" :size="24" />
       </GlassPanel>
     </AppTopBar>
-
+    <PageGift v-if="activeTab === AppNav.GIFT" />
     <PageHomeTabAgenda v-if="activeTab === AppNav.AGENDA" />
 
     <PageHomeTabProfile v-if="activeTab === AppNav.ME" />
