@@ -190,19 +190,19 @@
 
   @property --light-deg {
     syntax: '<angle>';
-    inherits: false;
+    inherits: true;
     initial-value: -10deg;
   }
 
   @property --glass-border-one {
     syntax: '<color>';
-    inherits: false;
+    inherits: true;
     initial-value: hsl(0 0 100 / 35%);
   }
 
   @property --glass-border-two {
     syntax: '<color>';
-    inherits: false;
+    inherits: true;
     initial-value: hsl(0 0 100 / 35%);
   }
 }

@@ -14,7 +14,6 @@ export interface AgendaItem {
   stage?: string
   /** Always-on booth tab; still single-day `startAt` / `endAt` */
   alwaysOn?: boolean
-  inMySchedule?: boolean
 }
 
 export function isAlwaysOnItem(item: AgendaItem) {
@@ -43,7 +42,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Host',
       speakerImage: '/speaker-4.jpg',
       sparks: 10,
-      inMySchedule: true,
     },
     {
       id: 'agenda-tue-trends',
@@ -63,7 +61,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Marcus Lee',
       speakerImage: '/speaker-2.jpg',
       sparks: 12,
-      inMySchedule: true,
     },
     {
       id: 'agenda-tue-retail',
@@ -94,7 +91,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speakerImage: '/speaker-1.jpg',
       sparks: 20,
       stage: 'Stage A',
-      inMySchedule: true,
     },
     {
       id: 'agenda-wed-roi-1',
@@ -104,7 +100,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Andy Brown',
       speakerImage: '/speaker-2.jpg',
       sparks: 20,
-      inMySchedule: false,
     },
     {
       id: 'agenda-wed-roi-2',
@@ -114,7 +109,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Andy Brown',
       speakerImage: '/speaker-3.jpg',
       sparks: 20,
-      inMySchedule: true,
     },
     {
       id: 'agenda-wed-personal',
@@ -134,7 +128,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Dr. Kim',
       speakerImage: '/speaker-1.jpg',
       sparks: 22,
-      inMySchedule: true,
     },
     // Thu 2026-06-04 (5)
     {
@@ -154,7 +147,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Priya Shah',
       speakerImage: '/speaker-3.jpg',
       sparks: 17,
-      inMySchedule: true,
     },
     {
       id: 'agenda-thu-panel',
@@ -173,7 +165,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Facilitator',
       speakerImage: '/speaker-4.jpg',
       sparks: 25,
-      inMySchedule: true,
     },
     {
       id: 'agenda-thu-social',
@@ -203,7 +194,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Andy Brown',
       speakerImage: '/speaker-2.jpg',
       sparks: 12,
-      inMySchedule: true,
     },
     {
       id: 'agenda-fri-pitch',
@@ -222,7 +212,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       speaker: 'Product Team',
       speakerImage: '/speaker-4.jpg',
       sparks: 15,
-      inMySchedule: true,
     },
     {
       id: 'agenda-fri-closing',
@@ -252,22 +241,9 @@ export const useAgendaStore = defineStore('agenda', () => {
     return items.value.filter(i => !isAlwaysOnItem(i) && itemOnDate(i, date))
   }
 
-  const scheduledItems = computed(() =>
-    items.value.filter(i => i.inMySchedule),
-  )
-
-  function itemsForView(tab: 'all' | 'my-schedule', date: string | null) {
-    const byDate = itemsByDate(date)
-    if (tab === 'all')
-      return byDate
-    return byDate.filter(i => i.inMySchedule)
-  }
-
   return {
     items,
     itemsByDate,
-    scheduledItems,
-    itemsForView,
     isAgendaItemLive,
     isAlwaysOnItem,
     itemOnDate,

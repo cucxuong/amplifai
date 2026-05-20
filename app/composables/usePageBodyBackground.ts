@@ -1,6 +1,5 @@
 import {
   getLikelyNextPageBackgroundSrcs,
-  PAGE_BG_MODIFIERS,
   PAGE_BG_SOURCES,
   resolvePageBackground,
   toPageBackgroundUrl,
@@ -22,14 +21,22 @@ export function usePageBodyBackground() {
     resolvePageBackground(route.path, pageBackgroundState.value),
   )
 
-  const currentBackgroundUrl = computed(() =>
-    toPageBackgroundUrl(img, currentBackground.value.src),
-  )
+  const currentImageUrl = computed((): string | null => {
+    const c = currentBackground.value
+    return c.kind === 'image' ? toPageBackgroundUrl(img, c.src) : null
+  })
+
+  const bodyBackgroundStyle = computed(() => {
+    const c = currentBackground.value
+    if (c.kind === 'gradient')
+      return `background: ${c.background};`
+    return `background-image: url('${currentImageUrl.value}');`
+  })
 
   const likelyNextBackgroundUrls = computed(() =>
     getLikelyNextPageBackgroundSrcs(route.path, pageBackgroundState.value)
       .map(src => toPageBackgroundUrl(img, src))
-      .filter(href => href !== currentBackgroundUrl.value),
+      .filter(href => href !== currentImageUrl.value),
   )
 
   const allBackgroundUrls = computed(() =>
@@ -53,45 +60,52 @@ export function usePageBodyBackground() {
 
   useHead(computed(() => ({
     bodyAttrs: {
-      style: `background-image: url('${currentBackgroundUrl.value}');`,
+      style: bodyBackgroundStyle.value,
     },
     link: [
-      {
-        key: `page-bg-current-${currentBackgroundUrl.value}`,
-        rel: 'preload',
-        as: 'image',
-        href: currentBackgroundUrl.value,
-        fetchpriority: 'high',
-      },
+      ...(currentImageUrl.value
+        ? [{
+            key: `page-bg-current-${currentImageUrl.value}`,
+            rel: 'preload' as const,
+            as: 'image' as const,
+            href: currentImageUrl.value,
+            fetchpriority: 'high' as const,
+          }]
+        : []),
       ...likelyNextBackgroundUrls.value.map(href => ({
         key: `page-bg-prefetch-${href}`,
-        rel: 'prefetch',
-        as: 'image',
+        rel: 'prefetch' as const,
+        as: 'image' as const,
         href,
       })),
     ],
   })))
 
   onMounted(() => {
-    warmBackgrounds(allBackgroundUrls.value, currentBackgroundUrl.value)
+    warmBackgrounds(allBackgroundUrls.value, currentImageUrl.value ?? undefined)
   })
 
-  watch([currentBackgroundUrl, likelyNextBackgroundUrls], ([current, likely]) => {
-    warmBackgrounds([current, ...likely], current)
+  watch([currentImageUrl, likelyNextBackgroundUrls], ([current, likely]) => {
+    warmBackgrounds(
+      [...(current ? [current] : []), ...likely],
+      current ?? undefined,
+    )
   })
 
   watch(pageBackgroundState, () => {
     warmBackgrounds(
-      [currentBackgroundUrl.value, ...likelyNextBackgroundUrls.value],
-      currentBackgroundUrl.value,
+      [...(currentImageUrl.value ? [currentImageUrl.value] : []), ...likelyNextBackgroundUrls.value],
+      currentImageUrl.value ?? undefined,
     )
   })
 
   router.beforeEach((to) => {
-    const { src } = resolvePageBackground(to.path, pageBackgroundState.value)
-    warmPageBackgroundUrl(
-      toPageBackgroundUrl(img, src),
-      'preload',
-    )
+    const cfg = resolvePageBackground(to.path, pageBackgroundState.value)
+    if (cfg.kind === 'image') {
+      warmPageBackgroundUrl(
+        toPageBackgroundUrl(img, cfg.src),
+        'preload',
+      )
+    }
   })
 }
