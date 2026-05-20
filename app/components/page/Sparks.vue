@@ -48,27 +48,31 @@ const activities: ActivityItem[] = [
 const totalEarned = 240;
 const currentScore = 180;
 const maxScore = 240;
+
+const { goBack } = useAppBack('/agenda');
 </script>
 
 <template>
   <div
     id="sparks-page"
-    class="h-dvh flex flex-col"
+    class="page-content h-dvh flex flex-col"
   >
     <!-- Score header — sits on top of the body background image -->
     <div class="flex flex-col shrink-0 px-5 pb-8">
       <!-- Back button -->
       <AppTopBar class="px-0">
-        <NuxtLink
-          href="/"
-          role="button"
-          class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 glass-panel [--light-deg:-45deg] bg-primary/5 grid place-content-center active:scale-110 select-none"
+        <GlassPanel
+          as="button"
+          type="button"
+          :deg="-45"
+          class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
+          @click="goBack"
         >
           <Icon
             name="amplif:arrow-left"
             :size="24"
           />
-        </NuxtLink>
+        </GlassPanel>
       </AppTopBar>
 
       <!-- Rank badge -->

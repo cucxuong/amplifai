@@ -1,20 +1,6 @@
-import { signInWithEmail } from '../../services/auth/auth.service'
-
-interface EmailBody {
-  email?: string
-}
-
-export default defineEventHandler(async (event) => {
-  const body = await readBody<EmailBody>(event)
-  const email = body.email ?? ''
-
-  const { email: normalized, name } = await signInWithEmail(email)
-
-  await setUserSession(event, {
-    user: { email: normalized, name },
-    onboardingComplete: false,
-    loggedInAt: Date.now(),
+export default defineEventHandler(() => {
+  throw createError({
+    statusCode: 410,
+    message: 'Email-only sign-in is no longer supported. Use /api/auth/login with email and password.',
   })
-
-  return { ok: true }
 })

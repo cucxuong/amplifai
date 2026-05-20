@@ -2,11 +2,11 @@
 const activeAgendaTab = ref<'all' | 'my-schedule'>('all')
 
 const AGENDA_DAYS = [
-  {day: 'TUE', date: '2026-06-02'}, 
-  {day: 'WED', date: '2026-06-03'}, 
-  {day: 'THU', date: '2026-06-04'}, 
-  {day: 'FRI', date: '2026-06-05'}, 
-  {day: 'ALWAYS ON BOOTH', date: null}
+  { day: 'TUE', date: '2026-06-02' },
+  { day: 'WED', date: '2026-06-03' },
+  { day: 'THU', date: '2026-06-04' },
+  { day: 'FRI', date: '2026-06-05' },
+  { day: 'ALWAYS ON BOOTH', date: null },
 ] as const
 
 const activeDate = ref<string>(AGENDA_DAYS[0].day)
@@ -18,6 +18,7 @@ const agendaItems = computed(() => {
   return agendaItemsForView(activeAgendaTab.value, date ?? null) ?? []
 })
 </script>
+
 <template>
   <PageHomeContainer>
     <PageHomeWidgets show-activities />
@@ -37,20 +38,20 @@ const agendaItems = computed(() => {
             :class="activeAgendaTab === 'all' ? 'glass-panel bg-primary text-surface' : ''"
             @click="activeAgendaTab = 'all'"
           >
-            <span :class="['text-label', {'font-normal': activeAgendaTab !== 'all'}]">All events</span>
+            <span :class="['text-label', { 'font-normal': activeAgendaTab !== 'all' }]">All events</span>
           </div>
           <div
             class="rounded-[12px] p-2.5 px-4 grid place-content-center before:border-0"
             :class="activeAgendaTab === 'my-schedule' ? 'glass-panel bg-primary text-surface' : ''"
             @click="activeAgendaTab = 'my-schedule'"
           >
-            <span :class="['text-label', {'font-normal': activeAgendaTab !== 'my-schedule'}]">My schedule</span>
+            <span :class="['text-label', { 'font-normal': activeAgendaTab !== 'my-schedule' }]">My schedule</span>
           </div>
         </GlassPanel>
       </div>
 
       <div class="bg-white p-4 py-5 rounded-[28px] gap-7 flex flex-col">
-        <div class="flex *:flex-1 gap-2.5">
+        <div class="flex *:flex-1 gap-2.5 overflow-x-auto">
           <button
             v-for="day in AGENDA_DAYS"
             :key="day.day"
@@ -58,7 +59,7 @@ const agendaItems = computed(() => {
             :class="[
               day.date ? 'aspect-square size-13' : 'h-13 px-2.5',
               activeDate === day.day ? 'bg-[linear-gradient(135deg,#FF6E00,#FF003B)] *:text-primary' : 'bg-muted text-surface',
-              {'invisible pointer-events-none': activeAgendaTab === 'my-schedule' && !day.date},
+              { 'invisible pointer-events-none': activeAgendaTab === 'my-schedule' && !day.date },
             ]"
             :inert="activeAgendaTab === 'my-schedule' && !day.date"
             @click="activeDate = day.day"
@@ -66,7 +67,7 @@ const agendaItems = computed(() => {
             <span
               v-if="day.date"
               class="text-[11px] leading-[14px] tracking-[0.22px] text-subtle"
-            >{{day.day}}</span>
+            >{{ day.day }}</span>
             <span
               v-else
               class="text-[11px] leading-[14px] tracking-[0.22px] min-w-max"

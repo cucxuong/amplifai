@@ -46,24 +46,28 @@ const LEADER_BOARD_PLAYERS: LeaderBoardPlayerRow[] = [
     rank: 15,
   },
 ]
+
+const { goBack } = useAppBack('/agenda')
 </script>
 
 <template>
   <div
     id="leader-board-page"
-    class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="page-content h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
   >
     <AppTopBar class="p-4 py-2.5 h-auto z-10">
-      <NuxtLink
-        to="/"
+      <GlassPanel
+        as="button"
+        type="button"
         :deg="-45"
-        class="glass-panel appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
+        class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
+        @click="goBack"
       >
         <Icon
           name="amplif:arrow-left"
           :size="24"
         />
-      </NuxtLink>
+      </GlassPanel>
     </AppTopBar>
 
     <main class="flex flex-col">

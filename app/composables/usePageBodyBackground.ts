@@ -32,6 +32,12 @@ export function usePageBodyBackground() {
       'background-size: cover',
       'background-repeat: no-repeat',
     ]
+    if (c.kind === 'solid') {
+      return [
+        'background-image: none',
+        `background-color: ${c.color}`,
+      ].join('; ')
+    }
     if (c.kind === 'gradient') {
       return [
         ...base,
@@ -71,15 +77,42 @@ export function usePageBodyBackground() {
     }
   }
 
+  const vtActive = useState('viewTransitionActive', () => false)
+  const pendingBodyBg = useState<string | null>('pendingBodyBg', () => null)
+  const displayedBodyStyle = ref('')
+  let lastBackgroundKey = ''
+
+  function backgroundKey(bg: ReturnType<typeof resolvePageBackground>) {
+    if (bg.kind === 'solid') return `solid:${bg.color}`
+    if (bg.kind === 'gradient') return `gradient:${bg.background}`
+    return `image:${bg.src}`
+  }
+
+  function commitBodyBackground(style: string, key: string) {
+    lastBackgroundKey = key
+    displayedBodyStyle.value = style
+    if (import.meta.client)
+      document.body.setAttribute('style', style)
+  }
+
   function applyBodyBackground() {
-    if (!import.meta.client)
+    const style = bodyBackgroundStyle.value
+    const key = backgroundKey(currentBackground.value)
+
+    if (key === lastBackgroundKey)
       return
-    document.body.setAttribute('style', bodyBackgroundStyle.value)
+
+    if (import.meta.client && vtActive.value) {
+      pendingBodyBg.value = style
+      return
+    }
+
+    commitBodyBackground(style, key)
   }
 
   useHead(computed(() => ({
     bodyAttrs: {
-      style: bodyBackgroundStyle.value,
+      style: displayedBodyStyle.value || bodyBackgroundStyle.value,
       'data-page-bg': route.path,
     },
     link: [
@@ -102,6 +135,15 @@ export function usePageBodyBackground() {
   })))
 
   watch(bodyBackgroundStyle, applyBodyBackground, { immediate: true })
+
+  watch(vtActive, (active, wasActive) => {
+    if (wasActive && !active && pendingBodyBg.value) {
+      const style = pendingBodyBg.value
+      pendingBodyBg.value = null
+      const key = backgroundKey(currentBackground.value)
+      commitBodyBackground(style, key)
+    }
+  })
 
   onMounted(() => {
     applyBodyBackground()

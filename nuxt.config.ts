@@ -112,6 +112,10 @@ export default defineNuxtConfig({
   css: ['./app/assets/css/tailwind.css'],
 
   app: {
+    viewTransition: {
+      enabled: true,
+      types: ['fade'],
+    },
     head: {
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },

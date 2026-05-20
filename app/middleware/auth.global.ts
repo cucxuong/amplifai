@@ -1,5 +1,5 @@
-const PUBLIC_PREFIXES = ['/', '/sign-in']
-const AUTH_HOME = '/'
+const PUBLIC_PREFIXES = ['/', '/sign-in', '/sign-up']
+const AUTH_HOME = '/agenda'
 
 export default defineNuxtRouteMiddleware((to) => {
   if (to.path === '/pick-persona' || to.path.startsWith('/pick-persona/'))
@@ -11,7 +11,7 @@ export default defineNuxtRouteMiddleware((to) => {
   )
 
   if (loggedIn.value) {
-    if (to.path.startsWith('/sign-in'))
+    if (to.path.startsWith('/sign-in') || to.path.startsWith('/sign-up'))
       return navigateTo(AUTH_HOME)
     return
   }

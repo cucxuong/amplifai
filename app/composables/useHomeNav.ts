@@ -28,11 +28,26 @@ export const APP_NAV_ITEMS = [
   },
 ] as const
 
+function isSignedInShellRoute(path: string) {
+  return path === '/agenda'
+    || path.startsWith('/me')
+    || path.startsWith('/gift')
+}
+
 export function useHomeNav() {
-  const activeTab = useState<AppNav>('activeTab', () => AppNav.AGENDA )
+  const route = useRoute()
+
+  const activeTab = computed(() => {
+    if (route.path.startsWith('/me')) return AppNav.ME
+    if (route.path.startsWith('/scan')) return AppNav.SCAN
+    if (route.path.startsWith('/gift')) return AppNav.GIFT
+    if (route.path.startsWith('/agenda') || route.path === '/') return AppNav.AGENDA
+    return AppNav.AGENDA
+  })
 
   return {
     activeTab,
     APP_NAV_ITEMS,
+    isSignedInShellRoute,
   }
 }

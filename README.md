@@ -2,11 +2,14 @@
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Authentication (email)
+## Authentication (email + password)
 
 1. Copy `.env.example` to `.env` and set `NUXT_SESSION_PASSWORD` (at least 32 characters), e.g. `openssl rand -base64 32`.
-2. Sign in at `/sign-in` with any valid email (password + OTP via SMTP are stubbed for a later phase).
-3. Optional: configure `NUXT_SMTP_*` when implementing real OTP email delivery.
+2. **Sign up** at `/sign-up` (first name, last name, email, password ≥ 8 chars). A 6-digit verification code is logged to the server console in development (see `[smtp.service]`).
+3. **Verify email** at `/sign-up/verify-email` with that code, then complete onboarding.
+4. **Sign in** at `/sign-in` with the same email and password.
+5. **Forgot password:** `/sign-in/forgot-password` → enter code at `/sign-in/verify-code` → set a new password.
+6. Optional: configure `NUXT_SMTP_*` for real OTP email delivery.
 
 ### iOS Safari / LAN dev testing
 

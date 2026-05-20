@@ -1,6 +1,9 @@
 <script setup lang="ts">
+definePageMeta({
+  viewTransition: fadeViewTransition,
+})
+
 const route = useRoute()
-const router = useRouter()
 const agendaStore = useAgendaStore()
 const { complete } = useQrScanCheckIn(() => sessionId.value)
 
@@ -18,10 +21,10 @@ watchEffect(() => {
   if (!exists) navigateTo('/')
 })
 
-function goBack() {
-  if (import.meta.client && window.history.length > 1) router.back()
-  else navigateTo(sessionId.value ? `/scan/${sessionId.value}` : '/scan')
-}
+const scanBackFallback = computed(() =>
+  sessionId.value ? `/scan/${sessionId.value}` : '/scan',
+)
+const { goBack } = useAppBack(scanBackFallback)
 
 function submit() {
   error.value = ''
@@ -33,7 +36,7 @@ function submit() {
 <template>
   <div
     id="scan-code-page"
-    class="h-dvh bg-black grid grid-rows-[auto_minmax(0,1fr)]"
+    class="page-content h-dvh bg-black grid grid-rows-[auto_minmax(0,1fr)]"
   >
     <AppTopBar class="px-4 py-2.5 h-auto flex items-center">
       <GlassPanel

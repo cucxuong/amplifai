@@ -13,7 +13,7 @@ export function isValidEmail(email: string): boolean {
   return EMAIL_RE.test(email)
 }
 
-/** Email-only sign-in for MVP. OTP/password wired in a later phase. */
+/** Legacy helper; prefer credentials.service login/register. */
 export async function signInWithEmail(email: string): Promise<SignInWithEmailResult> {
   const normalized = normalizeEmail(email)
   if (!isValidEmail(normalized)) {

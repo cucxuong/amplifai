@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  viewTransition: fadeViewTransition,
+})
+
 const route = useRoute()
 const store = useAgendaStore()
 

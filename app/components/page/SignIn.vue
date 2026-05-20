@@ -1,51 +1,52 @@
 <script setup lang="ts">
-const step = ref<'intro' | 'email'>('intro')
-const email = ref('guest@loreal.com')
+import { authErrorCode, authErrorMessage, authErrorStatus } from '~/utils/auth-errors'
+
+const email = ref('')
+const password = ref('')
 const isSubmitting = ref(false)
-const fieldError = ref<string | null>(null)
+const passwordError = ref(false)
+const formError = ref<string | null>(null)
+const verifyEmailAddress = ref<string | null>(null)
 
-const emailInput = useTemplateRef<HTMLInputElement>('emailInput')
+const canSubmit = computed(
+  () => email.value.trim() && password.value.length >= 8 && !isSubmitting.value,
+)
 
-function showEmailForm() {
-  fieldError.value = null
-  step.value = 'email'
-  nextTick(() => {
-    emailInput.value?.focus()
-  })
-}
-
-async function submitEmail() {
-  fieldError.value = null
-  const value = email.value.trim()
-  if (!value) {
-    fieldError.value = 'Enter your email address.'
-    return
-  }
-
+async function submitLogin() {
+  passwordError.value = false
+  formError.value = null
+  verifyEmailAddress.value = null
   isSubmitting.value = true
   try {
-    await $fetch('/api/auth/email', {
+    await $fetch('/api/auth/login', {
       method: 'POST',
-      body: { email: value },
+      body: {
+        email: email.value.trim(),
+        password: password.value,
+      },
       credentials: 'include',
     })
 
-    const { fetch: fetchSession, loggedIn } = useUserSession()
-    await fetchSession()
-
-    if (!loggedIn.value) {
-      fieldError.value = 'Session could not be started. Check connection and try again.'
+    const ok = await refreshAuthSession()
+    if (!ok) {
+      formError.value = 'Session could not be started. Try again.'
       return
     }
 
     await navigateTo('/')
   }
   catch (err: unknown) {
-    const message = err && typeof err === 'object' && 'data' in err
-      && err.data && typeof err.data === 'object' && 'message' in err.data
-      ? String(err.data.message)
-      : 'Sign in failed. Try again.'
-    fieldError.value = message
+    if (authErrorStatus(err) === 403 || authErrorCode(err) === 'EMAIL_NOT_VERIFIED') {
+      verifyEmailAddress.value = email.value.trim()
+      formError.value = authErrorMessage(
+        err,
+        'Please verify your email before signing in.',
+      )
+      return
+    }
+
+    passwordError.value = true
+    formError.value = authErrorMessage(err, 'Sign in failed. Try again.')
   }
   finally {
     isSubmitting.value = false
@@ -54,109 +55,86 @@ async function submitEmail() {
 </script>
 
 <template>
-  <div
-    id="sign-in-page"
-    class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
-  >
-    <AppTopBar>
-      <NuxtLink
-        href="/"
-        prefetch
-        role="button"
-        class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 glass-panel [--light-deg:-45deg] bg-primary/5 grid place-content-center active:scale-110 select-none"
+  <AuthScreen back-fallback="/">
+    <div class="space-y-2">
+      <h2 class="text-heading">
+        Sign in
+      </h2>
+      <p class="text-secondary">
+        Welcome back to AmplifAI.
+      </p>
+    </div>
+
+    <form
+      class="space-y-2"
+      @submit.prevent="submitLogin"
+    >
+      <p
+        v-if="formError && !passwordError"
+        class="text-caption text-[#FF003B]"
+        role="alert"
       >
-        <Icon
-          name="amplif:arrow-left"
-          :size="24"
+        {{ formError }}
+        <NuxtLink
+          v-if="verifyEmailAddress"
+          :to="{ path: '/sign-up/verify-email', query: { email: verifyEmailAddress } }"
+          class="font-bold underline block mt-1"
+        >
+          Verify email
+        </NuxtLink>
+      </p>
+
+      <AuthField
+        v-model="email"
+        label="Email Address"
+        type="email"
+        icon="amplif:mail"
+        placeholder="Enter your email"
+        autocomplete="email"
+        inputmode="email"
+        :disabled="isSubmitting"
+        @update:model-value="passwordError = false; verifyEmailAddress = null"
+      />
+
+      <AuthField
+        v-model="password"
+        label="Password"
+        type="password"
+        icon="amplif:lock"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+        :disabled="isSubmitting"
+        :error="passwordError"
+        error-message="Password is incorrect"
+        :clearable="false"
+        @update:model-value="passwordError = false"
+      />
+
+      <div class="flex justify-end -mt-1">
+        <NuxtLink
+          to="/sign-in/forgot-password"
+          class="text-sm font-bold text-tertiary py-2"
+        >
+          Forgot password?
+        </NuxtLink>
+      </div>
+
+      <div class="space-y-2 pt-4">
+        <AuthPrimaryButton
+          label="Log in"
+          :disabled="!canSubmit"
+          :loading="isSubmitting"
         />
-      </NuxtLink>
-    </AppTopBar>
-    <main class="space-y-9 p-4 py-5 overflow-y-auto overflow-x-clip">
-      <div class="space-y-2">
-        <h2 class="text-heading">
-          Sign in
-        </h2>
-        <p class="text-secondary">
-          Welcome back to AmplifAI.
-        </p>
-      </div>
-
-      <div
-        v-if="step === 'intro'"
-        class="space-y-4"
-      >
-        <GlassPanel
-          as="button"
-          type="button"
-          class="p-4 pr-3.5 appearance-none outline-none! bg-primary/5 transition-all active:scale-[1.015] flex w-full items-center justify-between gap-3 text-left"
-          :deg="-30"
-          @click="showEmailForm"
-        >
-          <Icon
-            name="amplif:profile"
-            :size="36"
-          />
-          <div class="flex flex-col flex-1 gap-1">
-            <span class="font-bold">Continue with email</span>
-            <span class="text-caption text-secondary leading-[14px]">Sign in with your work email</span>
-          </div>
-          <Icon
-            name="amplif:arrow-right"
-            :size="24"
-          />
-        </GlassPanel>
-      </div>
-
-      <form
-        v-else
-        class="space-y-4"
-        @submit.prevent="submitEmail"
-      >
-        <p
-          v-if="fieldError"
-          class="text-caption text-red-400"
-          role="alert"
-        >
-          {{ fieldError }}
-        </p>
-        <label class="glass-panel flex items-center h-14 rounded-xl p-3 px-4 bg-primary/5">
-          <input
-            ref="emailInput"
-            v-model="email"
-            type="email"
-            name="email"
-            autocomplete="email"
-            inputmode="email"
-            required
-            placeholder="Enter your email"
-            class="appearance-none outline-none!"
-            :disabled="isSubmitting"
+        <p class="text-center text-sm text-secondary">
+          Create an account?
+          <NuxtLink
+            to="/sign-up"
+            class="font-bold text-tertiary px-2 py-1"
           >
-        </label>
-        <button
-          type="submit"
-          class="flex justify-center w-full outline-none! p-5 py-3.5 rounded-[20px] font-bold leading-[24px] active:scale-[1.015] select-none transition-all not-disabled:bg-[linear-gradient(135deg,#FF6E00,#FF003B)] disabled:bg-subtle disabled:text-muted"
-          :disabled="!email || isSubmitting"
-        >
-          Continue
-        </button>
-      </form>
-
-      <div class="flex gap-2 select-none">
-        <Icon
-          name="amplif:alert-circle"
-          :size="16"
-        />
-        <div class="flex flex-col flex-1 text-caption gap-0.5">
-          <span class="font-bold text-secondary">Need help signing in?</span>
-          <span class="text-tertiary">Contact IT support · helpdesk@loreal.com</span>
-        </div>
+            Sign Up
+          </NuxtLink>
+        </p>
       </div>
-    </main>
-    <AppBottomBar>
-      <div class="text-center text-caption text-pretty text-subtle *:inline-block">
-        <strong>Privacy & data:</strong> <span>Session-only sign-in.</span> <span>Data deleted 30 days post-event.</span>
-      </div>
-    </AppBottomBar>
-  </div>
+    </form>
+  </AuthScreen>
 </template>

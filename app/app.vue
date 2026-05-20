@@ -23,6 +23,8 @@ watch(() => scrollY.value !== minScrollTop.value, (y) => {
 
 <template>
   <div class="pt-(--app-min-scroll-top) pb-25 w-dvw max-w-md mx-auto">
-    <NuxtPage />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>

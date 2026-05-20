@@ -4,8 +4,8 @@ const props = defineProps<{
   sessionId?: string
 }>()
 
-const router = useRouter()
 const { complete } = useQrScanCheckIn(() => props.sessionId)
+const { goBack } = useAppBack('/agenda')
 
 const videoRef = ref<HTMLVideoElement | null>(null)
 const isHandling = ref(false)
@@ -22,11 +22,6 @@ const statusLabel = computed(() => {
   if (scannerStatus.value === 'error') return 'CAMERA UNAVAILABLE'
   return 'SEARCHING FOR QR…'
 })
-
-function goBack() {
-  if (import.meta.client && window.history.length > 1) router.back()
-  else navigateTo('/')
-}
 
 function resetInvalid() {
   scanUiStatus.value = 'searching'
@@ -66,7 +61,7 @@ onUnmounted(() => stop())
 <template>
   <div
     id="scan-qr-page"
-    class="h-dvh bg-black grid grid-rows-[auto_minmax(0,1fr)]"
+    class="page-content h-dvh bg-black grid grid-rows-[auto_minmax(0,1fr)]"
   >
     <AppTopBar class="px-4 py-2.5 h-auto flex items-center">
       <GlassPanel

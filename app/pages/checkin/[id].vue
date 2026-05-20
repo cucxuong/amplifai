@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  viewTransition: fadeViewTransition,
+});
+
 const route = useRoute();
 const agendaStore = useAgendaStore();
 const qrStore = useQrCampaignsStore();
@@ -29,7 +33,7 @@ watchEffect(() => {
   <div
     v-if="isValid"
     id="checkin-success-page"
-    class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="page-content h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
   >
     <!-- Top bar -->
     <AppTopBar class="p-4 h-auto flex items-center justify-between">

@@ -10,7 +10,10 @@ async function completeOnboarding(body: { personaId?: string, skip?: boolean }) 
   isSubmitting.value = true
   try {
     await $fetch('/api/user/persona', { method: 'POST', body })
-    await useUserSession().fetch()
+    const ok = await refreshAuthSession()
+    if (!ok)
+      return
+    await navigateTo('/agenda', { replace: true })
   }
   finally {
     isSubmitting.value = false

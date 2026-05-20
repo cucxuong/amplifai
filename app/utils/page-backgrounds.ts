@@ -22,12 +22,16 @@ export interface PageBackgroundState {
 export const LEADER_BOARD_BACKGROUND =
   'linear-gradient(180deg, #000 0%, #0021A5 100%)'
 
+/** Figma Gift tab — black to deep royal blue */
+export const GIFT_PAGE_BACKGROUND = LEADER_BOARD_BACKGROUND
+
 /** Figma Scan QR code screen — full black body behind #scan-qr-page */
 export const SCAN_PAGE_BACKGROUND = '#000000'
 
 export type PageBackgroundConfig =
   | { kind: 'image'; src: PageBackgroundSource }
   | { kind: 'gradient'; background: string }
+  | { kind: 'solid'; color: string }
 
 export type PageBackgroundUrlBuilder = (
   src: PageBackgroundSource,
@@ -47,15 +51,23 @@ export function resolvePageBackground(
   state: PageBackgroundState,
 ): PageBackgroundConfig {
   if (routePath.startsWith('/scan'))
-    return { kind: 'gradient', background: SCAN_PAGE_BACKGROUND }
+    return { kind: 'solid', color: SCAN_PAGE_BACKGROUND }
   if (routePath.startsWith('/leader-board'))
     return { kind: 'gradient', background: LEADER_BOARD_BACKGROUND }
-  if (routePath.startsWith('/sign-in'))
+  if (routePath.startsWith('/gift'))
+    return { kind: 'gradient', background: GIFT_PAGE_BACKGROUND }
+  if (routePath.startsWith('/sign-in') || routePath.startsWith('/sign-up'))
     return { kind: 'image', src: '/sign-in.png' }
   if (!state.loggedIn)
     return { kind: 'image', src: '/slash.png' }
   if (!state.onboardingComplete)
     return { kind: 'image', src: '/pick-persona.png' }
+  if (
+    routePath === '/agenda'
+    || routePath.startsWith('/me')
+    || routePath === '/'
+  )
+    return { kind: 'image', src: '/sign-in.png' }
   return { kind: 'image', src: '/sign-in.png' }
 }
 
@@ -66,13 +78,15 @@ export function getLikelyNextPageBackgroundSrcs(
 ): PageBackgroundSource[] {
   if (routePath.startsWith('/scan'))
     return []
-  if (routePath.startsWith('/leader-board'))
+  if (routePath.startsWith('/leader-board') || routePath.startsWith('/gift'))
     return ['/sign-in.png']
-  if (routePath.startsWith('/sign-in'))
+  if (routePath.startsWith('/sign-in') || routePath.startsWith('/sign-up'))
     return ['/pick-persona.png', '/sign-in.png']
   if (!state.loggedIn)
     return ['/sign-in.png']
   if (!state.onboardingComplete)
+    return ['/sign-in.png']
+  if (routePath === '/agenda' || routePath.startsWith('/me'))
     return ['/sign-in.png']
   return []
 }

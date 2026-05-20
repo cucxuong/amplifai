@@ -1,7 +1,11 @@
 <script setup lang="ts">
+definePageMeta({
+  viewTransition: stackViewTransition,
+});
+
 const route = useRoute();
-const router = useRouter();
 const store = useAgendaStore();
+const { goBack } = useAppBack('/agenda');
 const { isInUserCalendar, toggleSchedule: toggleUserSchedule } =
   useAgendaSchedule();
 
@@ -10,7 +14,7 @@ const item = computed(() =>
 );
 
 watchEffect(() => {
-  if (!item.value) navigateTo("/");
+  if (!item.value) navigateTo('/agenda');
 });
 
 /**
@@ -42,11 +46,6 @@ const isInMySchedule = computed(() =>
   item.value ? isInUserCalendar(item.value) : false,
 );
 
-function goBack() {
-  if (window.history.length > 1) router.back();
-  else navigateTo("/");
-}
-
 function toggleSchedule() {
   if (item.value) toggleUserSchedule(item.value.id);
 }
@@ -61,7 +60,7 @@ function handleCheckIn() {
   <div
     v-if="item"
     id="agenda-detail-page"
-    class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="page-content h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
   >
     <!-- Top bar -->
     <AppTopBar class="p-4 h-auto flex items-center">
@@ -72,7 +71,10 @@ function handleCheckIn() {
         class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
         @click="goBack"
       >
-        <Icon name="amplif:arrow-left" :size="24" />
+        <Icon
+          name="amplif:arrow-left"
+          :size="24"
+        />
       </GlassPanel>
     </AppTopBar>
 
@@ -86,12 +88,15 @@ function handleCheckIn() {
         class="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-full font-bold text-caption tracking-widest leading-none select-none"
         style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
       >
-        <Icon name="amplif:dot" :size="8" />
+        <Icon
+          name="amplif:dot"
+          :size="8"
+        />
         <span class="text-[12px] text-secondary"> LIVE NOW </span>
       </div>
 
       <!-- Title -->
-      <h1 class="text-[2rem] leading-[1.15] font-bold text-[#D2D5DA]">
+      <h1 class="text-[2rem] leading-[1.15] font-bold text-tertiary">
         {{ item.title }}
       </h1>
 
@@ -99,7 +104,7 @@ function handleCheckIn() {
       <p class="text-secondary leading-relaxed text-[16px]">
         {{
           item.description ??
-          "Join us for this session at L'Oréal ONE SINGAPORE."
+            "Join us for this session at L'Oréal ONE SINGAPORE."
         }}
       </p>
 
@@ -109,12 +114,14 @@ function handleCheckIn() {
         class="self-start inline-flex items-center gap-1 px-2 py-1.5 rounded-[8px]"
         style="background: #ccf3ff"
       >
-        <NuxtImg src="/agenda-star.png" class="size-4 object-contain" />
+        <NuxtImg
+          src="/agenda-star.png"
+          class="size-4 object-contain"
+        />
         <span
           class="font-bold text-label tracking-wide leading-none"
           style="background: #ccf3ff; color: #0057ff"
-          ><b>+{{ item.sparks }} SPARKS</b> ON CHECK-IN</span
-        >
+        ><b>+{{ item.sparks }} SPARKS</b> ON CHECK-IN</span>
       </div>
 
       <!-- Divider -->
@@ -152,18 +159,24 @@ function handleCheckIn() {
       <div class="flex flex-col gap-5">
         <!-- Date -->
         <div class="flex items-start gap-3.5">
-          <Icon name="amplif:calendar-2" :size="24" class="shrink-0 mt-0.5" />
+          <Icon
+            name="amplif:calendar-2"
+            :size="24"
+            class="shrink-0 mt-0.5"
+          />
           <div class="flex flex-col gap-0.5">
             <span class="font-bold leading-snug">{{ formattedDay }}</span>
-            <span class="text-caption text-secondary"
-              >{{ formattedStart }} - {{ formattedEnd }}</span
-            >
+            <span class="text-caption text-secondary">{{ formattedStart }} - {{ formattedEnd }}</span>
           </div>
         </div>
 
         <!-- Location -->
         <div class="flex items-start gap-3.5">
-          <Icon name="amplif:map-pin" :size="24" class="shrink-0 mt-0.5" />
+          <Icon
+            name="amplif:map-pin"
+            :size="24"
+            class="shrink-0 mt-0.5"
+          />
           <div class="flex flex-col gap-0.5">
             <span class="font-bold leading-snug">{{
               item.location ?? item.stage ?? "Main Stage"
@@ -171,8 +184,7 @@ function handleCheckIn() {
             <span
               v-if="item.locationDetail"
               class="text-caption text-secondary"
-              >{{ item.locationDetail }}</span
-            >
+            >{{ item.locationDetail }}</span>
           </div>
         </div>
       </div>

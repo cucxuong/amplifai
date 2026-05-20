@@ -77,96 +77,156 @@
     background-position: top right;
   }
 
-  /* Default crossfade */
+  /* Shell chrome stays fixed during tab / stack transitions */
+  .shell-chrome {
+    view-transition-name: shell-chrome;
+  }
+
+  .page-content {
+    view-transition-name: page-content;
+  }
+
+  ::view-transition-group(shell-chrome) {
+    animation: none;
+  }
+
+  /* Default crossfade (root + unnamed) */
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation-duration: 0.3s;
+    animation-fill-mode: both;
   }
 
-  /* Slide left animation */
+  /* Tab / scan crossfade — page content only */
+  html:active-view-transition-type(fade) {
+
+    &::view-transition-old(root),
+    &::view-transition-new(root) {
+      animation: none;
+    }
+
+    &::view-transition-old(page-content) {
+      animation: vt-fade-out 0.2s ease-out both;
+    }
+
+    &::view-transition-new(page-content) {
+      animation: vt-fade-in 0.2s ease-out both;
+      z-index: 1;
+    }
+  }
+
+  /* Forward stack push */
   html:active-view-transition-type(slide-in) {
-    &::view-transition-old(root) {
-      animation: fade-out 0.3s ease-in-out;
+
+    &::view-transition-old(root),
+    &::view-transition-new(root) {
+      animation: none;
     }
 
-    &::view-transition-new(root) {
-      animation: slide-in-right 0.3s ease-in-out;
+    &::view-transition-old(page-content) {
+      animation: vt-slide-out-left 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+      z-index: 0;
+    }
+
+    &::view-transition-new(page-content) {
+      animation: vt-slide-in-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+      z-index: 1;
     }
   }
 
-  /* Slide right animation */
+  /* Back stack pop */
   html:active-view-transition-type(slide-out) {
-    &::view-transition-old(root) {
-      animation: slide-out-right 0.3s ease-in-out;
-    }
 
+    &::view-transition-old(root),
     &::view-transition-new(root) {
-      animation: fade-in 0.3s ease-in-out;
+      animation: none;
+    }
+
+    &::view-transition-old(page-content) {
+      animation: vt-slide-out-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+      z-index: 1;
+    }
+
+    &::view-transition-new(page-content) {
+      animation: vt-slide-in-left 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+      z-index: 0;
     }
   }
 
-  @keyframes fade-out {
+  @media (prefers-reduced-motion: reduce) {
+
+    ::view-transition-old(root),
+    ::view-transition-new(root),
+    ::view-transition-old(page-content),
+    ::view-transition-new(page-content) {
+      animation-duration: 0.01ms !important;
+    }
+  }
+
+  @keyframes vt-fade-out {
     from {
       opacity: 1;
-      scale: 1;
     }
 
     to {
       opacity: 0;
-      transform: translateX(-10%);
-      scale: 0.95;
     }
   }
 
-  @keyframes fade-in {
+  @keyframes vt-fade-in {
     from {
       opacity: 0;
-      transform: translateX(-10%);
-      scale: 0.95;
     }
 
     to {
       opacity: 1;
-      scale: 1;
     }
   }
 
-  @keyframes slide-out-left {
+  @keyframes vt-slide-out-left {
     from {
+      opacity: 1;
       transform: translateX(0);
     }
 
     to {
-      transform: translateX(-100%);
+      opacity: 0.6;
+      transform: translateX(-32px);
     }
   }
 
-  @keyframes slide-in-right {
+  @keyframes vt-slide-in-right {
     from {
-      transform: translateX(100%);
+      opacity: 0.6;
+      transform: translateX(32px);
     }
 
     to {
+      opacity: 1;
       transform: translateX(0);
     }
   }
 
-  @keyframes slide-out-right {
+  @keyframes vt-slide-out-right {
     from {
+      opacity: 1;
       transform: translateX(0);
     }
 
     to {
-      transform: translateX(100%);
+      opacity: 0.6;
+      transform: translateX(32px);
     }
   }
 
-  @keyframes slide-in-left {
+  @keyframes vt-slide-in-left {
     from {
-      transform: translateX(-100%);
+      opacity: 0.6;
+      transform: translateX(-32px);
     }
 
     to {
+      opacity: 1;
       transform: translateX(0);
     }
   }
