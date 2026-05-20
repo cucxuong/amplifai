@@ -59,26 +59,18 @@
     @apply overscroll-none select-none;
   }
 
-  body,
-  body:has(#sign-in-page) {
-    background-image: url('/sign-in.png');
+  body {
     background-size: cover;
     background-position: 30% 0%;
     background-repeat: no-repeat;
   }
 
   body:has(#pick-persona-page) {
-    background-image: url('/pick-persona.png');
-    background-size: cover;
     background-position: center center;
-    background-repeat: no-repeat;
   }
 
   body:has(#slash-page) {
-    background-image: url('/slash.png');
-    background-size: cover;
     background-position: top right;
-    background-repeat: no-repeat;
   }
 
   /* Default crossfade */

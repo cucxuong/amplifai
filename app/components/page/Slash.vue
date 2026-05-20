@@ -28,7 +28,7 @@ const isPortrait = computed(() => height.value >= width.value)
     </AppTopBar>
 
     <main
-      class="flex flex-col"
+      class="flex flex-col overflow-y-auto overflow-x-clip"
       :class="isPortrait ? 'justify-end pt-[calc(50dvh+var(--app-min-scroll-top))] pb-[min(4rem,10dvh)]' : 'justify-center py-8'"
     >
       <div class="flex flex-col items-center gap-2">

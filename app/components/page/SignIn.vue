@@ -71,7 +71,7 @@ async function submitEmail() {
         />
       </NuxtLink>
     </AppTopBar>
-    <main class="space-y-9 p-4 py-5">
+    <main class="space-y-9 p-4 py-5 overflow-y-auto overflow-x-clip">
       <div class="space-y-2">
         <h2 class="text-heading">
           Sign in

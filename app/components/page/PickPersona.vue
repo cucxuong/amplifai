@@ -37,7 +37,7 @@ async function skip() {
     id="pick-persona-page"
     class="h-dvh grid grid-rows-[minmax(0,1fr)_auto]"
   >
-    <main class="flex flex-col gap-8 p-4 pt-8">
+    <main class="flex flex-col gap-8 p-4 pt-8 overflow-y-auto overflow-x-clip">
       <div class="space-y-2">
         <h2 class="text-heading">
           Pick your persona

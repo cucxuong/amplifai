@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const APP_MIN_SCROLL_TOP_VAR = '--app-min-scroll-top'
 
+usePageBodyBackground()
+
 const minScrollTopRaw = useCssVar(APP_MIN_SCROLL_TOP_VAR)
 
 const minScrollTop = computed(
