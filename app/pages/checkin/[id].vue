@@ -135,14 +135,9 @@ watchEffect(() => {
 
     <AppFixedBottom class="px-5 pt-2">
       <AppBottomBar>
-        <button
-          type="button"
-          class="appearance-none outline-none! w-full py-3.5 rounded-[20px] font-bold leading-6 text-center active:scale-[1.015] transition-all select-none text-surface"
-          style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
-          @click="navigateTo('/')"
-        >
+        <UiCTAButton @click="navigateTo('/')">
           Back to agenda
-        </button>
+        </UiCTAButton>
       </AppBottomBar>
     </AppFixedBottom>
   </div>

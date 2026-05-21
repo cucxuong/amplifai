@@ -56,12 +56,12 @@ async function signOut() {
           v-if="isGift"
           class="flex flex-col gap-4"
         >
-          <button
-            type="button"
-            class="appearance-none outline-none! h-13 w-full flex items-center justify-center rounded-[20px] text-base font-bold text-white active:scale-[1.02] select-none transition-transform"
-            style="background: linear-gradient(158deg, #FF6E00 0%, #FF003B 100%)"
+          <UiCTAButton
+            size="lg"
             @click="navigateTo('/scan')"
-          >Scan QR code</button>
+          >
+            Scan QR code
+          </UiCTAButton>
           <p class="text-caption leading-4 text-secondary text-center">
             ✨ Bonus: Redeeming prizes will NOT impact your final leaderboard score.
           </p>

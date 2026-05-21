@@ -61,6 +61,19 @@ const lorealFamilies = lorealFontFiles.map(({ name, rel, format, weight, style }
 
 const isProduction = process.env.NODE_ENV === 'production'
 const devHttpsEnabled = !isProduction && process.env.NUXT_DEV_HTTPS !== 'false'
+
+function envFlag(name: string, fallback = false): boolean {
+  const value = process.env[name]?.trim()
+  if (value === 'true' || value === '1')
+    return true
+  if (value === 'false' || value === '0')
+    return false
+  return fallback
+}
+
+/** Loaded from .env at dev/build start; overridden at runtime by NUXT_AUTH_BYPASS on Vercel. */
+const authBypassDefault = envFlag('NUXT_AUTH_BYPASS', !isProduction)
+
 const sessionCookieSecure
   = process.env.NUXT_SESSION_COOKIE_SECURE === 'true'
     ? true
@@ -74,9 +87,17 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
 
   runtimeConfig: {
-    authBypass:
-      process.env.NUXT_AUTH_BYPASS === 'true'
-      || (process.env.NUXT_AUTH_BYPASS !== 'false' && process.env.VERCEL === '1'),
+    /** Overridden at runtime by NUXT_AUTH_BYPASS (Vercel dashboard / .env). */
+    authBypass: authBypassDefault,
+    oauth: {
+      microsoft: {
+        clientId: '',
+        clientSecret: '',
+        tenant: '',
+        redirectURL: '',
+        scope: ['openid', 'profile', 'email', 'User.Read'],
+      },
+    },
     session: {
       cookie: {
         secure: sessionCookieSecure,
@@ -109,6 +130,13 @@ export default defineNuxtConfig({
   ],
 
   css: ['./app/assets/css/tailwind.css'],
+
+  routeRules: {
+    '/sign-up': { redirect: { to: '/sign-in', statusCode: 301 } },
+    '/sign-up/verify-email': { redirect: { to: '/sign-in', statusCode: 301 } },
+    '/sign-in/forgot-password': { redirect: { to: '/sign-in', statusCode: 301 } },
+    '/sign-in/verify-code': { redirect: { to: '/sign-in', statusCode: 301 } },
+  },
 
   app: {
     head: {

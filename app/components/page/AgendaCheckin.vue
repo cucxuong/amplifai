@@ -108,14 +108,9 @@ const emit = defineEmits<{
 
     <!-- Bottom CTA -->
     <AppBottomBar>
-      <button
-        type="button"
-        class="appearance-none outline-none! w-full py-3.5 rounded-[20px] text-white font-bold leading-6 text-center active:scale-[1.015] transition-all select-none"
-        style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
-        @click="emit('close')"
-      >
+      <UiCTAButton @click="emit('close')">
         Back to agenda
-      </button>
+      </UiCTAButton>
     </AppBottomBar>
   </div>
 </template>

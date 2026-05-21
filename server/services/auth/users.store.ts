@@ -4,12 +4,14 @@ export interface StoredUser {
   email: string
   firstName: string
   lastName: string
-  passwordHash: string
-  passwordSalt: string
+  passwordHash?: string
+  passwordSalt?: string
   emailVerified: boolean
   onboardingComplete: boolean
   personaId: string | null
   createdAt: number
+  authProvider?: 'azure' | 'local'
+  azureOid?: string
 }
 
 const STORAGE_KEY = 'auth:users'
@@ -19,6 +21,7 @@ function normalizeStoredUser(raw: StoredUser): StoredUser {
     ...raw,
     onboardingComplete: raw.onboardingComplete ?? false,
     personaId: raw.personaId ?? null,
+    authProvider: raw.authProvider ?? (raw.azureOid ? 'azure' : 'local'),
   }
 }
 
@@ -44,6 +47,12 @@ export async function findUserByEmail(email: string): Promise<StoredUser | null>
   return user ? normalizeStoredUser(user) : null
 }
 
+export async function findUserByAzureOid(oid: string): Promise<StoredUser | null> {
+  const users = await readUsers()
+  const match = Object.values(users).find(user => user.azureOid === oid)
+  return match ? normalizeStoredUser(match) : null
+}
+
 export async function saveUser(user: StoredUser): Promise<void> {
   const users = await readUsers()
   users[user.email] = normalizeStoredUser(user)
@@ -62,6 +71,8 @@ export async function updateUser(
       | 'lastName'
       | 'onboardingComplete'
       | 'personaId'
+      | 'authProvider'
+      | 'azureOid'
     >
   >,
 ): Promise<StoredUser | null> {

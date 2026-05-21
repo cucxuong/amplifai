@@ -1,4 +1,4 @@
-const PUBLIC_PREFIXES = ['/', '/sign-in', '/sign-up']
+const PUBLIC_PREFIXES = ['/sign-in']
 export default defineNuxtRouteMiddleware((to) => {
   const { loggedIn } = useUserSession()
 
@@ -9,12 +9,13 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   const AUTH_HOME = '/agenda'
-  const isPublic = PUBLIC_PREFIXES.some(
-    p => to.path === p || to.path.startsWith(`${p}/`),
-  )
+  const isPublic = to.path === '/'
+    || PUBLIC_PREFIXES.some(
+      prefix => to.path === prefix || to.path.startsWith(`${prefix}/`),
+    )
 
   if (loggedIn.value) {
-    if (to.path.startsWith('/sign-in') || to.path.startsWith('/sign-up'))
+    if (to.path.startsWith('/sign-in'))
       return navigateTo(AUTH_HOME)
     return
   }

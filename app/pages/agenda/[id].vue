@@ -178,14 +178,9 @@ function handleCheckIn() {
 
     <AppFixedBottom class="px-5 pt-2">
       <AppBottomBar class="flex flex-col gap-3">
-        <button
-          type="button"
-          class="appearance-none outline-none! w-full py-3.5 rounded-[20px] font-bold leading-6 text-center active:scale-[1.015] transition-all select-none text-white"
-          style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
-          @click="handleCheckIn"
-        >
+        <UiCTAButton @click="handleCheckIn">
           Scan QR to check in
-        </button>
+        </UiCTAButton>
         <button
           type="button"
           class="appearance-none outline-none! w-full py-2 text-center font-bold leading-6 active:opacity-70 transition-opacity select-none"

@@ -9,7 +9,7 @@ const isPortrait = computed(() => height.value >= width.value)
     class="h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)]"
   >
     <AppTopBar class="px-4 py-2.5">
-      <div class="bg-[rgba(5,10,48,0.4)] rounded-[20px] p-4 px-5 flex items-center justify-between gap-4">
+      <GlassPanel class="bg-[rgba(5,10,48,0.4)] p-4 px-5 flex items-center justify-between gap-4">
         <NuxtImg
           src="/brand-logo.svg"
           alt="L'Oréal-ONESINGAPORE"
@@ -24,7 +24,7 @@ const isPortrait = computed(() => height.value >= width.value)
           height="22"
           preload
         />
-      </div>
+      </GlassPanel>
     </AppTopBar>
 
     <main
@@ -56,14 +56,12 @@ const isPortrait = computed(() => height.value >= width.value)
 
     <AppFixedBottom class="px-4">
       <AppBottomBar class="space-y-4">
-        <NuxtLink
-          href="/sign-in"
+        <UiCTAButton
+          to="/sign-in"
           prefetch
-          class="flex justify-center w-full outline-none! px-5 py-3.5 rounded-[20px] font-bold leading-6 text-white active:scale-[1.015] transition-all"
-          style="background: linear-gradient(157.57deg, #FF6E00 0%, #FF003B 100%)"
         >
           Get started
-        </NuxtLink>
+        </UiCTAButton>
         <div class="text-center text-caption text-pretty text-subtle">
           INTERNAL · L'ORÉAL EMPLOYEES ONLY
         </div>

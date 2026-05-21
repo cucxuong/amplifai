@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { PERSONAS } from '#shared/utils/personas'
 
-const { session } = useUserSession()
+const { session, loggedIn } = useUserSession()
 
-const selectedId = ref<string>(session.value?.personaId ?? 'default')
+const backFallback = '/agenda'
+
+const selectedId = ref<string>(session.value?.personaId ?? PERSONAS[0]!.id)
 const isSubmitting = ref(false)
+const showSkip = computed(() => !session.value?.onboardingComplete)
 
 async function completeOnboarding(body: { personaId?: string, skip?: boolean }) {
   if (isSubmitting.value)
@@ -40,9 +43,15 @@ async function skip() {
 <template>
   <div
     id="pick-persona-page"
-    class="h-full min-h-0 grid grid-rows-[minmax(0,1fr)]"
+    class="h-dvh min-h-0 grid grid-rows-[auto_minmax(0,1fr)]"
   >
-    <main class="grid grid-rows-[auto_minmax(0,1fr)] gap-8 px-4 pt-8 py-5 overflow-y-auto overflow-x-clip">
+    <AppTopBar
+      v-if="loggedIn"
+      class="px-4 py-2.5 h-auto"
+    >
+      <UiBackButton :fallback="backFallback" />
+    </AppTopBar>
+    <main class="flex flex-col gap-8 px-4 pt-8 py-5 overflow-y-auto overflow-x-clip">
       <div class="space-y-2">
         <h2 class="text-heading">
           Pick your persona
@@ -51,7 +60,6 @@ async function skip() {
           You can change it anytime.
         </p>
       </div>
-
       <div class="grid grid-cols-2 gap-3 content-start">
         <GlassPanel
           v-for="persona in PERSONAS"
@@ -67,6 +75,7 @@ async function skip() {
           <div class="rounded-full size-22.5 overflow-hidden bg-[#000D42]/10 outline-6 outline-primary/10">
             <NuxtImg
               :src="persona.image"
+              :alt="persona.label"
               class="rounded-full size-full object-cover object-center"
             />
           </div>
@@ -78,16 +87,14 @@ async function skip() {
 
     <AppFixedBottom class="px-4">
       <AppBottomBar class="space-y-3">
-        <button
-          type="button"
-          class="flex justify-center w-full outline-none! px-5 py-3.5 rounded-[20px] font-bold leading-6 text-white active:scale-[1.015] transition-all disabled:opacity-60"
-          style="background: linear-gradient(157.57deg, #FF6E00 0%, #FF003B 100%)"
+        <UiCTAButton
           :disabled="!selectedId || isSubmitting"
           @click="confirmPersona"
         >
           Continue
-        </button>
+        </UiCTAButton>
         <button
+          v-if="showSkip"
           type="button"
           class="flex justify-center w-full outline-none! text-caption text-subtle active:scale-[1.015] transition-all disabled:opacity-60"
           :disabled="isSubmitting"

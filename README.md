@@ -2,47 +2,44 @@
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Authentication (email + password)
+## Authentication (Azure AD SSO)
+
+Sign-in uses **Microsoft Entra ID** (Azure AD). Email/password and sign-up flows are removed.
 
 1. Copy `.env.example` to `.env` and set `NUXT_SESSION_PASSWORD` (at least 32 characters), e.g. `openssl rand -base64 32`.
-2. **Sign up** at `/sign-up` (first name, last name, email, password ≥ 6 chars). A 6-digit verification code is logged to the server console in development (see `[smtp.service]`).
-3. **Verify email** at `/sign-up/verify-email` with that code, then sign in at `/sign-in`.
-4. **Sign in** at `/sign-in` with the same email and password.
-5. **Forgot password:** `/sign-in/forgot-password` → enter code at `/sign-in/verify-code` → set a new password.
-6. Optional: configure `NUXT_SMTP_*` for real OTP email delivery.
+2. Register an Entra app and set:
+   - `NUXT_OAUTH_MICROSOFT_CLIENT_ID`
+   - `NUXT_OAUTH_MICROSOFT_CLIENT_SECRET`
+   - `NUXT_OAUTH_MICROSOFT_TENANT` (directory tenant GUID)
+3. Add redirect URI: `https://<your-host>/auth/microsoft`
+4. Open `/sign-in` → **Continue with Microsoft** → complete Entra login → persona onboarding → `/agenda`.
 
-### Demo shortcuts (temporary — remove before production)
+Only `@loreal.com` accounts are accepted.
 
-| Shortcut | Value |
-|----------|-------|
-| OTP (signup + reset) | `111111` |
-| Guest sign-in (no signup) | `guest@loreal.com` / `123456` |
+### Mock SSO bypass (`NUXT_AUTH_BYPASS`)
 
-Sign-in prefills guest credentials. After signup OTP verify, you are redirected to sign-in with your registered email prefilled (no auto-login).
+The Microsoft button tries mock SSO first (`POST /api/auth/dev-session`). If bypass is off, it falls through to real Entra (`/auth/microsoft`).
 
-### Vercel demo bypass (temporary)
+| Where | `NUXT_AUTH_BYPASS` unset | `true` | `false` |
+|-------|--------------------------|--------|---------|
+| Local `npm run dev` | Mock SSO **on** | Mock SSO on | Real Entra |
+| Vercel Production / Preview | Real Entra | Mock SSO on | Real Entra |
 
-On Vercel, auth bypass **auto-enables** via the `VERCEL=1` env var (in-memory storage, relaxed OTP/password checks). You only need:
+**Vercel dashboard:** Project → **Settings** → **Environment Variables** → add `NUXT_AUTH_BYPASS` (`true` or `false`) for Production, Preview, and/or Development. Redeploy after changing env vars.
 
-| Variable | Value |
-|----------|-------|
-| `NUXT_SESSION_PASSWORD` | 32+ character secret |
+Sync locally: `vercel env pull .env.local`
 
-Optional overrides:
+When bypass is on, auth data is stored **in memory** (resets on cold start). Production with real SSO should use `NUXT_AUTH_BYPASS=false` and persistent user storage.
 
-| Variable | Value | Effect |
-|----------|-------|--------|
-| `NUXT_AUTH_BYPASS` | `true` | Force bypass on any host (e.g. local demo) |
-| `NUXT_AUTH_BYPASS` | `false` | Disable bypass on Vercel (requires persistent storage) |
+### Testing checklist
 
-When bypass is enabled:
-
-- Auth data is stored **in memory** (fixes signup 500 on Vercel's read-only filesystem).
-- Sign in with a **registered, verified** email; password is not validated (UI still requires ≥ 6 chars).
-
-Demo shortcuts (`111111` OTP, guest account) work in **all environments** regardless of bypass — see table above.
-
-**Caveats:** user data resets on cold start/redeploy; not shared across serverless instances. Set `NUXT_AUTH_BYPASS=false` and add persistent storage (Vercel KV, Postgres, etc.) before production launch.
+- [ ] `/sign-in` → Microsoft → Entra → `/` → persona → `/agenda`
+- [ ] Returning user keeps `personaId` and `onboardingComplete`
+- [ ] Protected routes redirect to `/sign-in` when logged out
+- [ ] Legacy URLs (`/sign-up`, `/sign-in/forgot-password`) redirect to `/sign-in`
+- [ ] OAuth failure shows error on `/sign-in?error=sso_failed`
+- [ ] Sign out on `/me` clears session and returns to `/`
+- [ ] Vercel Preview: `NUXT_AUTH_BYPASS=true` → mock SSO; `false` → Entra
 
 ### iOS Safari / LAN dev testing
 

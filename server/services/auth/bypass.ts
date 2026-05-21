@@ -1,26 +1,29 @@
-import { normalizeEmail } from './auth.service'
-
 function isTruthyEnv(value: unknown): boolean {
-  return value === true || value === 'true' || value === '1'
+  if (value === true)
+    return true
+  if (typeof value === 'string')
+    return value.trim() === 'true' || value.trim() === '1'
+  return false
 }
 
+function isFalsyEnv(value: unknown): boolean {
+  if (value === false)
+    return true
+  if (typeof value === 'string')
+    return value.trim() === 'false' || value.trim() === '0'
+  return false
+}
+
+/**
+ * Mock SSO bypass — NUXT_AUTH_BYPASS (Vercel dashboard / .env).
+ * Unset → on in local dev (`import.meta.dev`); off on production deploys.
+ */
 export function isAuthBypassEnabled(): boolean {
-  return isTruthyEnv(useRuntimeConfig().authBypass)
-}
+  const configValue = useRuntimeConfig().authBypass
+  if (isTruthyEnv(configValue))
+    return true
+  if (isFalsyEnv(configValue))
+    return false
 
-/** DEMO ONLY — remove before production */
-export const DEMO_OTP_CODE = '111111'
-
-/** DEMO ONLY — remove before production */
-export const DEMO_GUEST_EMAIL = 'guest@loreal.com'
-
-/** DEMO ONLY — remove before production */
-export const DEMO_GUEST_PASSWORD = '123456'
-
-export function isBypassOtpCode(code: string): boolean {
-  return code.trim() === DEMO_OTP_CODE
-}
-
-export function isDemoGuestLogin(email: string, password: string): boolean {
-  return normalizeEmail(email) === DEMO_GUEST_EMAIL && password === DEMO_GUEST_PASSWORD
+  return import.meta.dev
 }

@@ -182,18 +182,13 @@ onUnmounted(resetDrag)
                 </div>
               </div>
 
-              <button
-                type="button"
-                class="appearance-none outline-none! flex h-[52px] w-full items-center justify-center rounded-[20px] text-base font-bold leading-6 transition-all select-none"
-                :class="canSubmit
-                  ? 'text-primary active:scale-[1.015]'
-                  : 'bg-[#e5e7eb] text-subtle'"
-                :style="canSubmit ? { background: 'linear-gradient(171.74deg, #ff6e00 0%, #ff003b 100%)' } : undefined"
+              <UiCTAButton
+                class="h-[52px] text-base"
                 :disabled="!canSubmit || submitting"
                 @click="emit('submit')"
               >
                 Search
-              </button>
+              </UiCTAButton>
             </div>
           </div>
         </Transition>
