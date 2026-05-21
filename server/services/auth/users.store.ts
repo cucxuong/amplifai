@@ -1,3 +1,5 @@
+import { readAuthRecord, writeAuthRecord } from './auth-storage'
+
 export interface StoredUser {
   email: string
   firstName: string
@@ -10,8 +12,6 @@ export interface StoredUser {
   createdAt: number
 }
 
-type UsersRecord = Record<string, StoredUser>
-
 const STORAGE_KEY = 'auth:users'
 
 function normalizeStoredUser(raw: StoredUser): StoredUser {
@@ -22,9 +22,10 @@ function normalizeStoredUser(raw: StoredUser): StoredUser {
   }
 }
 
+type UsersRecord = Record<string, StoredUser>
+
 async function readUsers(): Promise<UsersRecord> {
-  const storage = useStorage('data')
-  const data = await storage.getItem<UsersRecord>(STORAGE_KEY)
+  const data = await readAuthRecord<UsersRecord>(STORAGE_KEY)
   if (!data)
     return {}
   const normalized: UsersRecord = {}
@@ -34,8 +35,7 @@ async function readUsers(): Promise<UsersRecord> {
 }
 
 async function writeUsers(users: UsersRecord): Promise<void> {
-  const storage = useStorage('data')
-  await storage.setItem(STORAGE_KEY, users)
+  await writeAuthRecord(STORAGE_KEY, users)
 }
 
 export async function findUserByEmail(email: string): Promise<StoredUser | null> {

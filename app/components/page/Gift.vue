@@ -59,11 +59,6 @@ const infoRows = [
             >
               {{ row.text }}
             </p>
-            <p
-              v-else
-              class="text-base leading-5 text-primary flex-1"
-              v-html="row.html"
-            />
           </li>
         </ul>
       </div>

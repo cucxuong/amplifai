@@ -1,4 +1,5 @@
 import { normalizeEmail, isValidEmail } from '../../services/auth/auth.service'
+import { isAuthBypassEnabled } from '../../services/auth/bypass'
 import { markEmailVerified } from '../../services/auth/credentials.service'
 import { verifyOtp, type OtpPurpose } from '../../services/auth/otp.service'
 import { issueResetToken } from '../../services/auth/reset-token.service'
@@ -28,6 +29,10 @@ export default defineEventHandler(async (event) => {
     const user = await markEmailVerified(email)
     if (!user) {
       throw createError({ statusCode: 404, message: 'Account not found' })
+    }
+
+    if (isAuthBypassEnabled()) {
+      return { ok: true, redirectToSignIn: true }
     }
 
     const stored = await findUserByEmail(email)

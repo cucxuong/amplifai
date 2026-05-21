@@ -1,3 +1,6 @@
+import { isAuthBypassEnabled, isBypassOtpCode } from './bypass'
+import { readAuthRecord, writeAuthRecord } from './auth-storage'
+
 export type OtpPurpose = 'signup' | 'reset'
 
 interface OtpEntry {
@@ -16,14 +19,12 @@ function storageKey(email: string, purpose: OtpPurpose): string {
 }
 
 async function readOtps(): Promise<OtpRecord> {
-  const storage = useStorage('data')
-  const data = await storage.getItem<OtpRecord>(STORAGE_KEY)
+  const data = await readAuthRecord<OtpRecord>(STORAGE_KEY)
   return data ?? {}
 }
 
 async function writeOtps(otps: OtpRecord): Promise<void> {
-  const storage = useStorage('data')
-  await storage.setItem(STORAGE_KEY, otps)
+  await writeAuthRecord(STORAGE_KEY, otps)
 }
 
 export function generateOtp(): string {
@@ -41,12 +42,24 @@ export async function storeOtp(email: string, code: string, purpose: OtpPurpose)
 }
 
 export async function verifyOtp(email: string, code: string, purpose: OtpPurpose): Promise<boolean> {
+  const trimmed = code.trim()
+
+  if (isAuthBypassEnabled()) {
+    if (!isBypassOtpCode(trimmed))
+      return false
+
+    const otps = await readOtps()
+    delete otps[storageKey(email, purpose)]
+    await writeOtps(otps)
+    return true
+  }
+
   const otps = await readOtps()
   const key = storageKey(email, purpose)
   const entry = otps[key]
   if (!entry || entry.expiresAt < Date.now())
     return false
-  if (entry.code !== code.trim())
+  if (entry.code !== trimmed)
     return false
   delete otps[key]
   await writeOtps(otps)

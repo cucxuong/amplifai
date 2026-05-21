@@ -23,7 +23,7 @@ const canVerifyOtp = computed(
 const canResetPassword = computed(
   () =>
     otpVerified.value
-    && password.value.length >= 8
+    && password.value.length >= 6
     && password.value === confirmPassword.value
     && !isSubmitting.value,
 )

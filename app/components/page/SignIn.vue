@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { authErrorCode, authErrorMessage, authErrorStatus } from '~/utils/auth-errors'
 
+const route = useRoute()
+
 const email = ref('')
 const password = ref('')
 const isSubmitting = ref(false)
@@ -8,8 +10,20 @@ const passwordError = ref(false)
 const formError = ref<string | null>(null)
 const verifyEmailAddress = ref<string | null>(null)
 
+const verifiedMessage = computed(() =>
+  route.query.verified === '1'
+    ? 'Email verified. Sign in with your account.'
+    : null,
+)
+
+onMounted(() => {
+  const queryEmail = String(route.query.email ?? '').trim()
+  if (queryEmail)
+    email.value = queryEmail
+})
+
 const canSubmit = computed(
-  () => email.value.trim() && password.value.length >= 8 && !isSubmitting.value,
+  () => email.value.trim() && password.value.length >= 6 && !isSubmitting.value,
 )
 
 async function submitLogin() {
@@ -69,6 +83,14 @@ async function submitLogin() {
       class="space-y-2"
       @submit.prevent="submitLogin"
     >
+      <p
+        v-if="verifiedMessage"
+        class="text-caption text-secondary"
+        role="status"
+      >
+        {{ verifiedMessage }}
+      </p>
+
       <p
         v-if="formError && !passwordError"
         class="text-caption text-[#FF003B]"

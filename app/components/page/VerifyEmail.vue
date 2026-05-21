@@ -31,7 +31,7 @@ async function verifyEmail() {
   resendMessage.value = null
   isSubmitting.value = true
   try {
-    await $fetch('/api/auth/verify-otp', {
+    const result = await $fetch<{ ok: boolean, redirectToSignIn?: boolean }>('/api/auth/verify-otp', {
       method: 'POST',
       body: {
         email: email.value,
@@ -40,6 +40,11 @@ async function verifyEmail() {
       },
       credentials: 'include',
     })
+
+    if (result.redirectToSignIn) {
+      await navigateTo({ path: '/sign-in', query: { verified: '1', email: email.value } })
+      return
+    }
 
     const ok = await refreshAuthSession()
     if (!ok) {

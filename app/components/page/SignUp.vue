@@ -14,7 +14,7 @@ const canSubmit = computed(
     firstName.value.trim()
     && lastName.value.trim()
     && email.value.trim()
-    && password.value.length >= 8
+    && password.value.length >= 6
     && !isSubmitting.value,
 )
 
