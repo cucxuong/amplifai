@@ -10,18 +10,26 @@ export interface StoredUser {
   onboardingComplete: boolean
   personaId: string | null
   createdAt: number
-  authProvider?: 'azure' | 'local'
+  authProvider?: 'saml' | 'azure' | 'local'
+  /** @deprecated use ssoSubjectId */
   azureOid?: string
+  ssoSubjectId?: string
 }
 
 const STORAGE_KEY = 'auth:users'
 
+function resolveSsoSubjectId(raw: StoredUser): string | undefined {
+  return raw.ssoSubjectId ?? raw.azureOid
+}
+
 function normalizeStoredUser(raw: StoredUser): StoredUser {
+  const ssoSubjectId = resolveSsoSubjectId(raw)
   return {
     ...raw,
     onboardingComplete: raw.onboardingComplete ?? false,
     personaId: raw.personaId ?? null,
-    authProvider: raw.authProvider ?? (raw.azureOid ? 'azure' : 'local'),
+    ssoSubjectId,
+    authProvider: raw.authProvider ?? (ssoSubjectId ? 'saml' : 'local'),
   }
 }
 
@@ -47,10 +55,17 @@ export async function findUserByEmail(email: string): Promise<StoredUser | null>
   return user ? normalizeStoredUser(user) : null
 }
 
-export async function findUserByAzureOid(oid: string): Promise<StoredUser | null> {
+export async function findUserBySsoSubjectId(subjectId: string): Promise<StoredUser | null> {
   const users = await readUsers()
-  const match = Object.values(users).find(user => user.azureOid === oid)
+  const match = Object.values(users).find(
+    user => resolveSsoSubjectId(user) === subjectId,
+  )
   return match ? normalizeStoredUser(match) : null
+}
+
+/** @deprecated use findUserBySsoSubjectId */
+export async function findUserByAzureOid(oid: string): Promise<StoredUser | null> {
+  return findUserBySsoSubjectId(oid)
 }
 
 export async function saveUser(user: StoredUser): Promise<void> {
@@ -73,6 +88,7 @@ export async function updateUser(
       | 'personaId'
       | 'authProvider'
       | 'azureOid'
+      | 'ssoSubjectId'
     >
   >,
 ): Promise<StoredUser | null> {

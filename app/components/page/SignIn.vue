@@ -11,7 +11,9 @@ watch(
   (error) => {
     formError.value = error === 'sso_failed'
       ? 'Microsoft sign-in failed. Try again.'
-      : null
+      : error === 'sso_not_configured'
+        ? 'Sign-in is not configured yet. Contact IT or use dev bypass.'
+        : null
   },
   { immediate: true },
 )
@@ -41,7 +43,7 @@ async function signInWithMicrosoft() {
       return
     }
 
-    await navigateTo('/auth/microsoft', { external: true })
+    await navigateTo('/api/auth/saml/login', { external: true })
   }
   catch (err: unknown) {
     formError.value = authErrorMessage(err, 'Microsoft sign-in failed. Try again.')

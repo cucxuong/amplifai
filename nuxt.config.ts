@@ -89,14 +89,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     /** Overridden at runtime by NUXT_AUTH_BYPASS (Vercel dashboard / .env). */
     authBypass: authBypassDefault,
-    oauth: {
-      microsoft: {
-        clientId: '',
-        clientSecret: '',
-        tenant: '',
-        redirectURL: '',
-        scope: ['openid', 'profile', 'email', 'User.Read'],
-      },
+    saml: {
+      entityId: 'https://amplifaiweek.loreal.sg',
+      acsUrl: '',
+      idpSsoUrl: '',
+      idpCert: '',
     },
     session: {
       cookie: {

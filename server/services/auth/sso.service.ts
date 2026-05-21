@@ -1,33 +1,98 @@
+import type { Profile } from '@node-saml/node-saml'
 import { isValidEmail, normalizeEmail } from './auth.service'
 import {
-  findUserByAzureOid,
   findUserByEmail,
+  findUserBySsoSubjectId,
   saveUser,
   updateUser,
   type StoredUser,
 } from './users.store'
 
-export interface MicrosoftGraphUser {
-  id?: string
-  mail?: string | null
-  userPrincipalName?: string | null
-  givenName?: string | null
-  surname?: string | null
-  displayName?: string | null
+export interface SamlUserClaims {
+  email: string
+  firstName: string
+  lastName: string
+  externalId: string
 }
 
 export const DEV_MOCK_SSO_EMAIL = 'dev.user@loreal.com'
 
 const ALLOWED_EMAIL_DOMAIN = '@loreal.com'
 
-function resolveSsoEmail(graphUser: MicrosoftGraphUser): string {
-  const raw = graphUser.mail?.trim() || graphUser.userPrincipalName?.trim() || ''
-  return normalizeEmail(raw)
+const EMAIL_CLAIM_KEYS = [
+  'email',
+  'mail',
+  'emailaddress',
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn',
+  'nameID',
+]
+
+const FIRST_NAME_CLAIM_KEYS = [
+  'givenName',
+  'firstname',
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+]
+
+const LAST_NAME_CLAIM_KEYS = [
+  'surname',
+  'lastname',
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+]
+
+const DISPLAY_NAME_CLAIM_KEYS = [
+  'displayName',
+  'name',
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name',
+]
+
+const OBJECT_ID_CLAIM_KEYS = [
+  'objectidentifier',
+  'objectId',
+  'http://schemas.microsoft.com/identity/claims/objectidentifier',
+]
+
+function claimValue(profile: Profile, keys: string[]): string {
+  for (const key of keys) {
+    const raw = profile[key]
+    if (typeof raw === 'string' && raw.trim())
+      return raw.trim()
+  }
+  return ''
+}
+
+function splitDisplayName(displayName: string): { firstName: string, lastName: string } {
+  const parts = displayName.trim().split(/\s+/)
+  if (parts.length === 0)
+    return { firstName: '', lastName: '' }
+  if (parts.length === 1)
+    return { firstName: parts[0]!, lastName: '' }
+  return {
+    firstName: parts[0]!,
+    lastName: parts.slice(1).join(' '),
+  }
+}
+
+export function mapSamlProfileToClaims(profile: Profile): SamlUserClaims {
+  const emailRaw = claimValue(profile, EMAIL_CLAIM_KEYS)
+  const email = normalizeEmail(emailRaw)
+
+  const displayName = claimValue(profile, DISPLAY_NAME_CLAIM_KEYS)
+  const fromDisplay = splitDisplayName(displayName)
+
+  const firstName = claimValue(profile, FIRST_NAME_CLAIM_KEYS) || fromDisplay.firstName
+  const lastName = claimValue(profile, LAST_NAME_CLAIM_KEYS) || fromDisplay.lastName
+
+  const externalId = claimValue(profile, OBJECT_ID_CLAIM_KEYS)
+    || profile.nameID?.trim()
+    || email
+
+  return { email, firstName, lastName, externalId }
 }
 
 function assertAllowedEmail(email: string): void {
   if (!isValidEmail(email)) {
-    throw createError({ statusCode: 401, message: 'Microsoft account email is invalid' })
+    throw createError({ statusCode: 401, message: 'SAML account email is invalid' })
   }
 
   if (!email.endsWith(ALLOWED_EMAIL_DOMAIN)) {
@@ -38,26 +103,26 @@ function assertAllowedEmail(email: string): void {
   }
 }
 
-export async function findOrCreateSsoUser(graphUser: MicrosoftGraphUser): Promise<StoredUser> {
-  const azureOid = graphUser.id?.trim()
-  if (!azureOid) {
-    throw createError({ statusCode: 401, message: 'Microsoft account id is missing' })
+export async function findOrCreateSamlUser(claims: SamlUserClaims): Promise<StoredUser> {
+  const externalId = claims.externalId?.trim()
+  if (!externalId) {
+    throw createError({ statusCode: 401, message: 'SAML user id is missing' })
   }
 
-  const byOid = await findUserByAzureOid(azureOid)
-  if (byOid)
-    return byOid
+  const bySubject = await findUserBySsoSubjectId(externalId)
+  if (bySubject)
+    return bySubject
 
-  const email = resolveSsoEmail(graphUser)
+  const email = normalizeEmail(claims.email)
   assertAllowedEmail(email)
 
   const existing = await findUserByEmail(email)
   if (existing) {
     const updated = await updateUser(email, {
-      azureOid,
-      authProvider: 'azure',
-      firstName: existing.firstName || graphUser.givenName?.trim() || '',
-      lastName: existing.lastName || graphUser.surname?.trim() || '',
+      ssoSubjectId: externalId,
+      authProvider: 'saml',
+      firstName: existing.firstName || claims.firstName,
+      lastName: existing.lastName || claims.lastName,
       emailVerified: true,
     })
     return updated ?? existing
@@ -65,14 +130,14 @@ export async function findOrCreateSsoUser(graphUser: MicrosoftGraphUser): Promis
 
   const user: StoredUser = {
     email,
-    firstName: graphUser.givenName?.trim() || '',
-    lastName: graphUser.surname?.trim() || '',
+    firstName: claims.firstName,
+    lastName: claims.lastName,
     emailVerified: true,
     onboardingComplete: false,
     personaId: null,
     createdAt: Date.now(),
-    authProvider: 'azure',
-    azureOid,
+    authProvider: 'saml',
+    ssoSubjectId: externalId,
   }
 
   await saveUser(user)
@@ -92,8 +157,8 @@ export async function findOrCreateDevMockUser(): Promise<StoredUser> {
     onboardingComplete: false,
     personaId: null,
     createdAt: Date.now(),
-    authProvider: 'azure',
-    azureOid: 'dev-mock-oid',
+    authProvider: 'saml',
+    ssoSubjectId: 'dev-mock-oid',
   }
 
   await saveUser(user)
