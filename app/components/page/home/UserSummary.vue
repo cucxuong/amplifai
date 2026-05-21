@@ -2,9 +2,14 @@
 import { PERSONAS } from '~~/shared/utils/personas'
 
 const { user, session } = useUserSession()
+const userStore = useUserStore()
+
+const personaId = computed(
+  () => userStore.profile?.personaId ?? session.value?.personaId,
+)
 
 const personaImg = computed(() => {
-  const persona = PERSONAS.find(p => p.id === session.value?.personaId)
+  const persona = PERSONAS.find(p => p.id === personaId.value)
   return persona?.image
 })
 
@@ -17,7 +22,7 @@ function openPickPersona() {
   <div class="flex items-center justify-between gap-4">
     <div class="flex flex-col">
       <h2 class="text-title capitalize">
-        Hi, {{ user.name }}
+        Hi, {{ user?.name }}
       </h2>
       <div class="text-caption leading-[18px] text-secondary uppercase">
         {{ new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).replace(/,/g, ' · ') }}

@@ -8,6 +8,9 @@ const showNavBar = computed(() => isAgendaHome.value)
 
 async function signOut() {
   useCurrentUserStore().clearSchedule()
+  useUserStore().reset()
+  useAgendaStore().reset()
+  useMinisiteStatus().clearUnavailable()
   await clear()
   await navigateTo('/')
 }

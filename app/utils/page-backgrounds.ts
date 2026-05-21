@@ -2,7 +2,6 @@ export type PageBackgroundLayoutKey =
   | 'slash'
   | 'agenda'
   | 'auth'
-  | 'signup'
   | 'persona'
   | 'sparks'
   | 'eventDetail'
@@ -38,7 +37,6 @@ export const PAGE_BG_BODY_POSITIONS: Record<PageBackgroundLayoutKey, string> = {
   slash: 'top right',
   agenda: '30% 0%',
   auth: '30% 0%',
-  signup: '30% 0%',
   persona: '0% 0%',
   sparks: '0% 0%',
   eventDetail: '0% 0%',
@@ -49,7 +47,6 @@ const PAGE_BG_OVERLAY: Record<PageBackgroundLayoutKey, boolean> = {
   slash: true,
   agenda: true,
   auth: true,
-  signup: true,
   persona: true,
   sparks: true,
   eventDetail: true,
@@ -88,9 +85,6 @@ export function resolvePageBackground(
 
   if (routePath.startsWith('/sign-in'))
     return imageConfig('/global-bg.png', 'auth')
-
-  if (routePath.startsWith('/sign-up'))
-    return imageConfig('/global-bg.png', 'signup')
 
   if (routePath.startsWith('/pick-persona'))
     return imageConfig('/global-bg.png', 'persona')

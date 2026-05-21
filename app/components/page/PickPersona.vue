@@ -2,23 +2,46 @@
 import { PERSONAS } from '#shared/utils/personas'
 
 const { session, loggedIn } = useUserSession()
+const { completeOnboarding } = useMinisiteAuth()
+const { unavailable } = useMinisiteStatus()
 
 const backFallback = '/agenda'
 
 const selectedId = ref<string>(session.value?.personaId ?? PERSONAS[0]!.id)
 const isSubmitting = ref(false)
+const formError = ref<string | null>(null)
 const showSkip = computed(() => !session.value?.onboardingComplete)
 
-async function completeOnboarding(body: { personaId?: string, skip?: boolean }) {
+async function confirmPersona() {
+  if (!selectedId.value || isSubmitting.value || unavailable.value)
+    return
+  isSubmitting.value = true
+  formError.value = null
+  try {
+    await completeOnboarding({ personaId: selectedId.value })
+    await navigateTo('/agenda', { replace: true })
+  }
+  catch (e: unknown) {
+    formError.value = isUnauthorizedError(e)
+      ? 'Could not connect to event backend — sign out and try again.'
+      : (e instanceof Error ? e.message : 'Something went wrong.')
+  }
+  finally {
+    isSubmitting.value = false
+  }
+}
+
+async function skip() {
   if (isSubmitting.value)
     return
   isSubmitting.value = true
+  formError.value = null
   try {
-    await $fetch('/api/user/persona', { method: 'POST', body })
-    const ok = await refreshAuthSession()
-    if (!ok)
-      return
+    await completeOnboarding({ skip: true })
     await navigateTo('/agenda', { replace: true })
+  }
+  catch (e: unknown) {
+    formError.value = e instanceof Error ? e.message : 'Something went wrong.'
   }
   finally {
     isSubmitting.value = false
@@ -27,16 +50,6 @@ async function completeOnboarding(body: { personaId?: string, skip?: boolean }) 
 
 function selectPersona(id: string) {
   selectedId.value = id
-}
-
-async function confirmPersona() {
-  if (!selectedId.value)
-    return
-  await completeOnboarding({ personaId: selectedId.value })
-}
-
-async function skip() {
-  await completeOnboarding({ skip: true })
 }
 </script>
 
@@ -52,6 +65,14 @@ async function skip() {
       <UiBackButton :fallback="backFallback" />
     </AppTopBar>
     <main class="flex flex-col gap-8 px-4 pt-8 py-5 overflow-y-auto overflow-x-clip">
+      <AppMinisiteUnavailableBanner />
+      <p
+        v-if="formError"
+        class="text-caption text-[#FF003B]"
+        role="alert"
+      >
+        {{ formError }}
+      </p>
       <div class="space-y-2">
         <h2 class="text-heading">
           Pick your persona
@@ -88,7 +109,7 @@ async function skip() {
     <AppFixedBottom class="px-4">
       <AppBottomBar class="space-y-3">
         <UiCTAButton
-          :disabled="!selectedId || isSubmitting"
+          :disabled="!selectedId || isSubmitting || unavailable"
           @click="confirmPersona"
         >
           Continue

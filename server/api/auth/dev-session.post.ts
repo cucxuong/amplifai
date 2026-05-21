@@ -1,6 +1,6 @@
 import { isAuthBypassEnabled } from '../../services/auth/bypass'
 import { findOrCreateDevMockUser } from '../../services/auth/sso.service'
-import { buildAuthSessionPayload } from '../../services/auth/users.store'
+import { buildSessionWithMinisiteBridge } from '../../services/minisite/bridge.service'
 
 export default defineEventHandler(async (event) => {
   if (!isAuthBypassEnabled()) {
@@ -11,7 +11,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = await findOrCreateDevMockUser()
-  await setUserSession(event, buildAuthSessionPayload(user))
+  const { payload } = await buildSessionWithMinisiteBridge(user)
+  await setUserSession(event, payload)
 
-  return { ok: true }
+  return { ok: true, minisiteLinked: !!payload.minisiteToken }
 })

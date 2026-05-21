@@ -3,20 +3,17 @@
  */
 export function useQrScanCheckIn(getSessionId?: () => string | undefined) {
   const agendaStore = useAgendaStore()
-  const qrStore = useQrCampaignsStore()
+  const checkInStore = useCheckInStore()
   const { isInUserCalendar, toggleSchedule } = useAgendaSchedule()
 
   function validate(text: string) {
     const sessionId = getSessionId?.()
     const target = resolveQrScan(text)
-    if (!target) return { ok: false as const }
+    if (!target)
+      return { ok: false as const }
 
-    if (target.type === 'campaign') {
-      const campaign = qrStore.getByCode(target.code)
-      if (!campaign || !qrStore.canRedeem(target.code))
-        return { ok: false as const }
-      return { ok: true as const, target, campaign }
-    }
+    if (target.type === 'checkin' || target.type === 'campaign' || target.type === 'order')
+      return { ok: true as const, target }
 
     const item = agendaStore.items.find(i => i.id === target.id)
     if (!item || (sessionId && sessionId !== target.id))
@@ -25,19 +22,38 @@ export function useQrScanCheckIn(getSessionId?: () => string | undefined) {
     return { ok: true as const, target, item }
   }
 
-  function complete(text: string) {
+  async function complete(text: string) {
     const result = validate(text)
-    if (!result.ok) return false
+    if (!result.ok)
+      return false
 
     if (result.target.type === 'campaign') {
-      qrStore.redeem(result.target.code)
-      navigateTo(`/checkin/${result.target.code}`)
+      const success = await checkInStore.redeemCampaignQr(result.target.code)
+      if (!success)
+        return false
+      await navigateTo(`/checkin/${result.target.code}`)
+      return true
+    }
+
+    if (result.target.type === 'order') {
+      const success = await checkInStore.redeemOrderByShortId(result.target.shortId)
+      if (!success)
+        return false
+      await navigateTo('/sparks')
+      return true
+    }
+
+    if (result.target.type === 'checkin') {
+      const success = await checkInStore.checkInByQr(result.target.qrCode)
+      if (!success)
+        return false
+      await navigateTo(`/checkin/${checkInStore.lastSuccess?.routeId ?? result.target.qrCode}`)
       return true
     }
 
     if (!isInUserCalendar(result.target.id))
       toggleSchedule(result.target.id)
-    navigateTo(`/checkin/${result.target.id}`)
+    await navigateTo(`/checkin/${result.target.id}`)
     return true
   }
 

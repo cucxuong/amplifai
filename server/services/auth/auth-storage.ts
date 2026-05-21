@@ -1,3 +1,4 @@
+import type { StorageValue } from 'unstorage'
 import { isAuthBypassEnabled } from './bypass'
 
 const memoryStore = new Map<string, unknown>()
@@ -19,7 +20,7 @@ async function readItem<T>(key: string): Promise<T | null> {
   }
 }
 
-async function writeItem<T>(key: string, value: T): Promise<void> {
+async function writeItem<T extends StorageValue>(key: string, value: T): Promise<void> {
   if (isAuthBypassEnabled()) {
     memoryStore.set(key, value)
     return
@@ -39,6 +40,6 @@ export async function readAuthRecord<T>(key: string): Promise<T | null> {
   return await readItem<T>(key)
 }
 
-export async function writeAuthRecord<T>(key: string, value: T): Promise<void> {
+export async function writeAuthRecord<T extends StorageValue>(key: string, value: T): Promise<void> {
   await writeItem(key, value)
 }

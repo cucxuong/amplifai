@@ -1,29 +1,31 @@
 <script setup lang="ts">
+const route = useRoute()
+const agendaStore = useAgendaStore()
+const checkInStore = useCheckInStore()
 
-const route = useRoute();
-const agendaStore = useAgendaStore();
-const qrStore = useQrCampaignsStore();
-
-const routeId = computed(() => route.params.id as string);
+const routeId = computed(() => route.params.id as string)
 
 const agendaItem = computed(() =>
-  agendaStore.items.find((i) => i.id === routeId.value),
-);
+  agendaStore.items.find(i => i.id === routeId.value),
+)
 
-const campaign = computed(() => qrStore.getByCode(routeId.value));
+const lastSuccess = computed(() =>
+  checkInStore.lastSuccess?.routeId === routeId.value ? checkInStore.lastSuccess : null,
+)
 
 const sourceTitle = computed(
-  () => agendaItem.value?.title ?? campaign.value?.name ?? "",
-);
+  () => agendaItem.value?.title ?? lastSuccess.value?.title ?? '',
+)
 const sparksEarned = computed(
-  () => agendaItem.value?.sparks ?? campaign.value?.sparks ?? 0,
-);
+  () => agendaItem.value?.sparks ?? lastSuccess.value?.sparks ?? 0,
+)
 
-const isValid = computed(() => Boolean(agendaItem.value || campaign.value));
+const isValid = computed(() => Boolean(agendaItem.value || lastSuccess.value))
 
 watchEffect(() => {
-  if (!isValid.value) navigateTo("/");
-});
+  if (!isValid.value)
+    navigateTo('/')
+})
 </script>
 
 <template>

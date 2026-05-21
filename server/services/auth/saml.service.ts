@@ -1,4 +1,4 @@
-import { SAML, type SamlConfig } from '@node-saml/node-saml'
+import { SAML, type Profile, type SamlConfig } from '@node-saml/node-saml'
 
 const DEFAULT_ENTITY_ID = 'https://amplifaiweek.loreal.sg'
 
@@ -61,7 +61,7 @@ export async function createLoginRedirectUrl(relayState = ''): Promise<string> {
   return saml.getAuthorizeUrlAsync(relayState, undefined, {})
 }
 
-export async function parseAcsResponse(body: Record<string, unknown>) {
+export async function parseAcsResponse(body: Record<string, unknown>): Promise<Profile> {
   const samlResponse = typeof body.SAMLResponse === 'string' ? body.SAMLResponse : ''
   if (!samlResponse) {
     throw createError({ statusCode: 400, message: 'SAMLResponse is missing' })
@@ -69,6 +69,9 @@ export async function parseAcsResponse(body: Record<string, unknown>) {
 
   const saml = createSamlClient()
   const { profile } = await saml.validatePostResponseAsync({ SAMLResponse: samlResponse })
+  if (!profile) {
+    throw createError({ statusCode: 401, message: 'SAML profile is missing' })
+  }
   return profile
 }
 

@@ -5,9 +5,9 @@ export function useAgendaSchedule() {
   const agenda = useAgendaStore()
   const currentUser = useCurrentUserStore()
 
-  currentUser.seedScheduleFromAgenda(agenda.items)
-
-  onMounted(() => currentUser.syncFromSession())
+  onMounted(() => {
+    void agenda.fetchSessions()
+  })
 
   function isInUserCalendar(itemOrId: AgendaItem | string): boolean {
     const id = typeof itemOrId === 'string' ? itemOrId : itemOrId.id
@@ -33,6 +33,5 @@ export function useAgendaSchedule() {
     addToSchedule: currentUser.addToSchedule,
     removeFromSchedule: currentUser.removeFromSchedule,
     toggleSchedule: currentUser.toggleSchedule,
-    syncScheduleFromSession: currentUser.syncFromSession,
   }
 }

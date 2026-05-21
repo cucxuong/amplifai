@@ -1,6 +1,6 @@
 import { parseAcsResponse } from '../../../services/auth/saml.service'
 import { findOrCreateSamlUser, mapSamlProfileToClaims } from '../../../services/auth/sso.service'
-import { buildAuthSessionPayload } from '../../../services/auth/users.store'
+import { buildSessionWithMinisiteBridge } from '../../../services/minisite/bridge.service'
 
 export default defineEventHandler(async (event) => {
   const contentType = getRequestHeader(event, 'content-type') || ''
@@ -17,7 +17,8 @@ export default defineEventHandler(async (event) => {
     const profile = await parseAcsResponse(body)
     const claims = mapSamlProfileToClaims(profile)
     const stored = await findOrCreateSamlUser(claims)
-    await setUserSession(event, buildAuthSessionPayload(stored))
+    const { payload } = await buildSessionWithMinisiteBridge(stored)
+    await setUserSession(event, payload)
     return sendRedirect(event, '/')
   }
   catch {

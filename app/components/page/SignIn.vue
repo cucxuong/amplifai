@@ -23,20 +23,25 @@ async function signInWithMicrosoft() {
   isSubmitting.value = true
 
   try {
-    const bypassAccepted = await $fetch('/api/auth/dev-session', {
+    const devSession = await $fetch<{ ok: true, minisiteLinked: boolean }>('/api/auth/dev-session', {
       method: 'POST',
       credentials: 'include',
-    }).then(() => true).catch((err: unknown) => {
+    }).catch((err: unknown) => {
       if (authErrorStatus(err) === 403)
-        return false
+        return null
       throw err
     })
 
-    if (bypassAccepted) {
+    if (devSession) {
       const ok = await refreshAuthSession()
       if (!ok) {
         formError.value = 'Session could not be started. Try again.'
         return
+      }
+
+      if (!devSession.minisiteLinked) {
+        useMinisiteStatus().markUnavailable()
+        formError.value = 'Signed in, but event backend not linked — check NUXT_MINISITE_* env and sign in again.'
       }
 
       await navigateTo('/')

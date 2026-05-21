@@ -4,11 +4,11 @@ const props = defineProps<{
   sessionId?: string
 }>()
 
-const { complete } = useQrScanCheckIn(() => props.sessionId)
+const { validate, complete } = useQrScanCheckIn(() => props.sessionId)
 
 const videoRef = ref<HTMLVideoElement | null>(null)
 const isHandling = ref(false)
-const scanUiStatus = ref<'searching' | 'invalid'>('searching')
+const scanUiStatus = ref<'searching' | 'invalid' | 'checking_in'>('searching')
 const showManualCode = ref(false)
 const manualCode = ref('')
 const manualCodeError = ref(false)
@@ -20,6 +20,7 @@ const { status: scannerStatus, start, stop } = useQrScanner({
 })
 
 const statusLabel = computed(() => {
+  if (scanUiStatus.value === 'checking_in') return 'CHECKING IN…'
   if (scanUiStatus.value === 'invalid') return 'INVALID QR'
   if (scannerStatus.value === 'permission_denied') return 'CAMERA ACCESS NEEDED'
   if (scannerStatus.value === 'error') return 'CAMERA UNAVAILABLE'
@@ -35,14 +36,37 @@ function showInvalid() {
   window.setTimeout(resetInvalid, 2500)
 }
 
-function handleDecode(text: string) {
-  if (isHandling.value) return
-  if (!complete(text)) {
-    showInvalid()
-    return
+async function submitValidatedCode(text: string, opts?: { manual?: boolean }) {
+  const parsed = validate(text)
+  if (!parsed.ok) {
+    if (opts?.manual)
+      manualCodeError.value = true
+    else
+      showInvalid()
+    return false
   }
-  isHandling.value = true
+
   stop()
+  isHandling.value = true
+  scanUiStatus.value = 'checking_in'
+
+  const ok = await complete(text)
+  if (!ok) {
+    isHandling.value = false
+    scanUiStatus.value = 'searching'
+    if (opts?.manual)
+      manualCodeError.value = true
+    else
+      start()
+    return false
+  }
+  return true
+}
+
+function handleDecode(text: string) {
+  if (isHandling.value)
+    return
+  void submitValidatedCode(text)
 }
 
 function useCodeInstead() {
@@ -64,16 +88,12 @@ function submitManualCode() {
   manualCodeError.value = false
   isSubmittingManualCode.value = true
 
-  if (!complete(manualCode.value)) {
-    manualCodeError.value = true
-  }
-  else {
-    isHandling.value = true
-    stop()
-    showManualCode.value = false
-  }
-
-  isSubmittingManualCode.value = false
+  void (async () => {
+    const ok = await submitValidatedCode(manualCode.value, { manual: true })
+    if (ok)
+      showManualCode.value = false
+    isSubmittingManualCode.value = false
+  })()
 }
 
 watch(manualCode, () => {

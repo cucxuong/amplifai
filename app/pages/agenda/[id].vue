@@ -5,11 +5,11 @@ const store = useAgendaStore();
 const { isInUserCalendar, toggleSchedule: toggleUserSchedule } =
   useAgendaSchedule();
 
-const item = computed(() =>
-  store.items.find((i) => i.id === (route.params.id as string)),
-);
+const routeId = computed(() => route.params.id as string);
+const { item, ready } = useAgendaItemRoute(routeId);
 
 watchEffect(() => {
+  if (!ready.value) return;
   if (!item.value) navigateTo('/agenda');
 });
 

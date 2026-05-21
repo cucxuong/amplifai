@@ -11,16 +11,21 @@ const AGENDA_DAYS = [
 
 const activeDate = ref<string>(AGENDA_DAYS[0].day)
 
+const agendaStore = useAgendaStore()
 const { agendaItemsForView } = useAgendaSchedule()
 
 const agendaItems = computed(() => {
   const date = activeDate.value === 'ALWAYS ON BOOTH' ? null : AGENDA_DAYS.find(day => day.day === activeDate.value)?.date
   return agendaItemsForView(activeAgendaTab.value, date ?? null) ?? []
 })
+
+const isLoading = computed(() => agendaStore.loading && !agendaStore.fetched)
+const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && agendaItems.value.length === 0)
 </script>
 
 <template>
   <PageHomeContainer>
+    <AppMinisiteUnavailableBanner class="mt-2" />
     <PageHomeWidgets show-activities />
 
     <div class="flex flex-col gap-4 p-4">
@@ -77,7 +82,30 @@ const agendaItems = computed(() => {
         </div>
 
         <div
-          v-if="agendaItems.length > 0"
+          v-if="isLoading"
+          class="py-10 text-center text-secondary text-label"
+        >
+          Loading agenda…
+        </div>
+
+        <div
+          v-else-if="agendaStore.error"
+          class="py-8 flex flex-col items-center gap-3"
+        >
+          <p class="text-caption text-secondary text-center">
+            {{ agendaStore.error }}
+          </p>
+          <button
+            type="button"
+            class="text-label font-bold text-primary underline"
+            @click="agendaStore.fetchSessions(true)"
+          >
+            Retry
+          </button>
+        </div>
+
+        <div
+          v-else-if="agendaItems.length > 0"
           class="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-3"
         >
           <PageHomeAgendaCard
@@ -88,7 +116,7 @@ const agendaItems = computed(() => {
           />
         </div>
 
-        <PageHomeAgendaEmpty v-else />
+        <PageHomeAgendaEmpty v-else-if="showEmpty" />
       </div>
     </div>
   </PageHomeContainer>

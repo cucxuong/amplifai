@@ -4,7 +4,7 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 
 ## Authentication (Azure AD SAML SSO)
 
-Sign-in uses **Microsoft Entra ID** via **SAML 2.0** (not OAuth). Email/password and sign-up flows are removed.
+Sign-in uses **Microsoft Entra ID** via **SAML 2.0** (not OAuth). Legacy email/password routes and UI were removed; `/sign-up` and forgot-password URLs redirect to `/sign-in`.
 
 1. Copy `.env.example` to `.env` and set `NUXT_SESSION_PASSWORD` (at least 32 characters), e.g. `openssl rand -base64 32`.
 2. After IT provisions the Azure AD Enterprise Application, set:
@@ -77,6 +77,38 @@ When bypass is on, auth data is stored **in memory** (resets on cold start). Pro
 4. Plain HTTP fallback: `npm run dev:http` (session cookies stay non-Secure in dev).
 
 Production must use real HTTPS; session cookies stay `Secure`.
+
+## Minisite API (BFF)
+
+Participant data (agenda, sparks, check-in, leaderboard, gift shop) is loaded via a **Nuxt BFF** at `/api/minisite/*`. The browser never calls minisite directly; Nitro forwards requests with a server-stored minisite JWT after SAML login.
+
+| Variable | Scope | Purpose |
+|----------|-------|---------|
+| `NUXT_MINISITE_API_BASE` | server only | Minisite origin, e.g. `https://minisite-roan.vercel.app` |
+| `NUXT_MINISITE_INTERNAL_KEY` | server only | Shared with minisite `SSO_BRIDGE_INTERNAL_KEY` for user sync |
+
+After SAML ACS (or dev bypass), amplifai calls minisite `POST /api/auth/sso-bridge` and stores `minisiteToken` in the sealed session. Pinia stores call same-origin BFF routes only.
+
+### Local dev setup
+
+**Option A — Vercel minisite (default):** copy `SSO_BRIDGE_INTERNAL_KEY` from the minisite Vercel project into amplifai `NUXT_MINISITE_INTERNAL_KEY`. Keep `NUXT_MINISITE_API_BASE=https://minisite-roan.vercel.app`.
+
+**Option B — local minisite:** run minisite on port 3001 (`npm run dev -- -p 3001` in the minisite repo), set `NUXT_MINISITE_API_BASE=http://localhost:3001`, and either leave `SSO_BRIDGE_INTERNAL_KEY` unset on minisite (dev allows any key) or set matching keys on both repos.
+
+After changing minisite env vars, **restart amplifai** and **sign out + sign in** so the session gets a fresh `minisiteToken`.
+
+**Smoke test** (replace URL and key):
+
+```bash
+curl -X POST http://localhost:3001/api/auth/sso-bridge \
+  -H "Content-Type: application/json" \
+  -H "X-Internal-Key: YOUR_KEY" \
+  -d '{"email":"dev.user@loreal.com","firstName":"Dev","lastName":"User"}'
+```
+
+Expect `{ "success": true, "data": { "token": "...", "user": {...} } }`. A 401 here means key mismatch — fix env before using the app.
+
+My-schedule favorites stay in `localStorage` until minisite adds a schedule API.
 
 ## Setup
 

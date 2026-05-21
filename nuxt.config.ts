@@ -89,6 +89,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     /** Overridden at runtime by NUXT_AUTH_BYPASS (Vercel dashboard / .env). */
     authBypass: authBypassDefault,
+    minisiteApiBase: process.env.NUXT_MINISITE_API_BASE || 'https://minisite-roan.vercel.app',
+    minisiteInternalKey: process.env.NUXT_MINISITE_INTERNAL_KEY || '',
     saml: {
       entityId: 'https://amplifaiweek.loreal.sg',
       acsUrl: '',

@@ -63,11 +63,6 @@ export async function findUserBySsoSubjectId(subjectId: string): Promise<StoredU
   return match ? normalizeStoredUser(match) : null
 }
 
-/** @deprecated use findUserBySsoSubjectId */
-export async function findUserByAzureOid(oid: string): Promise<StoredUser | null> {
-  return findUserBySsoSubjectId(oid)
-}
-
 export async function saveUser(user: StoredUser): Promise<void> {
   const users = await readUsers()
   users[user.email] = normalizeStoredUser(user)
@@ -106,13 +101,4 @@ export async function updateUser(
 export function displayName(user: Pick<StoredUser, 'firstName' | 'lastName' | 'email'>): string {
   const full = `${user.firstName} ${user.lastName}`.trim()
   return full || user.email.split('@')[0] || user.email
-}
-
-export function buildAuthSessionPayload(user: StoredUser) {
-  return {
-    user: { email: user.email, name: displayName(user) },
-    onboardingComplete: user.onboardingComplete,
-    personaId: user.personaId,
-    loggedInAt: Date.now(),
-  }
 }
