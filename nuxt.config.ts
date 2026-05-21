@@ -74,7 +74,9 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
 
   runtimeConfig: {
-    authBypass: process.env.NUXT_AUTH_BYPASS === 'true',
+    authBypass:
+      process.env.NUXT_AUTH_BYPASS === 'true'
+      || (process.env.NUXT_AUTH_BYPASS !== 'false' && process.env.VERCEL === '1'),
     session: {
       cookie: {
         secure: sessionCookieSecure,

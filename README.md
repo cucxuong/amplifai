@@ -13,12 +13,18 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 
 ### Vercel demo bypass (temporary)
 
-For event/demo deployments on Vercel, set these environment variables:
+On Vercel, auth bypass **auto-enables** via the `VERCEL=1` env var (in-memory storage, relaxed OTP/password checks). You only need:
 
 | Variable | Value |
 |----------|-------|
 | `NUXT_SESSION_PASSWORD` | 32+ character secret |
-| `NUXT_AUTH_BYPASS` | `true` |
+
+Optional overrides:
+
+| Variable | Value | Effect |
+|----------|-------|--------|
+| `NUXT_AUTH_BYPASS` | `true` | Force bypass on any host (e.g. local demo) |
+| `NUXT_AUTH_BYPASS` | `false` | Disable bypass on Vercel (requires persistent storage) |
 
 When bypass is enabled:
 
@@ -26,7 +32,7 @@ When bypass is enabled:
 - Sign up → enter **any 6-digit OTP** → redirected to sign in.
 - Sign in with a **registered, verified** email; password is not validated (UI still requires ≥ 6 chars).
 
-**Caveats:** user data resets on cold start/redeploy; not shared across serverless instances. Remove `NUXT_AUTH_BYPASS` and add persistent storage (Vercel KV, Postgres, etc.) before production launch.
+**Caveats:** user data resets on cold start/redeploy; not shared across serverless instances. Set `NUXT_AUTH_BYPASS=false` and add persistent storage (Vercel KV, Postgres, etc.) before production launch.
 
 ### iOS Safari / LAN dev testing
 

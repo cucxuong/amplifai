@@ -10,19 +10,32 @@ interface RegisterBody {
   lastName?: string
 }
 
+function isHttpError(err: unknown): err is { statusCode: number } {
+  return Boolean(err && typeof err === 'object' && 'statusCode' in err)
+}
+
 export default defineEventHandler(async (event) => {
   const body = await readBody<RegisterBody>(event)
 
-  const user = await register({
-    email: body.email ?? '',
-    password: body.password ?? '',
-    firstName: body.firstName ?? '',
-    lastName: body.lastName ?? '',
-  })
+  try {
+    const user = await register({
+      email: body.email ?? '',
+      password: body.password ?? '',
+      firstName: body.firstName ?? '',
+      lastName: body.lastName ?? '',
+    })
 
-  const code = generateOtp()
-  await storeOtp(user.email, code, 'signup')
-  await sendOtpEmail({ to: user.email, code })
+    const code = generateOtp()
+    await storeOtp(user.email, code, 'signup')
+    await sendOtpEmail({ to: user.email, code })
 
-  return { ok: true, email: normalizeEmail(user.email) }
+    return { ok: true, email: normalizeEmail(user.email) }
+  }
+  catch (err: unknown) {
+    if (isHttpError(err))
+      throw err
+
+    console.error('[auth/register]', err)
+    throw createError({ statusCode: 500, message: 'Registration failed' })
+  }
 })
