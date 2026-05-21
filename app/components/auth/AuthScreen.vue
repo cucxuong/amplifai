@@ -14,19 +14,18 @@ withDefaults(
 <template>
   <div
     :id="pageId"
-    class="page-content h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="page-content h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)_auto]"
   >
-    <AppTopBar>
+    <AppTopBar class="px-4 py-2.5 h-auto">
       <UiBackButton :fallback="backFallback" />
     </AppTopBar>
-    <main class="space-y-8 p-4 py-5 overflow-y-auto overflow-x-clip">
+    <main class="flex flex-col gap-8 px-4 py-5 overflow-y-auto overflow-x-clip">
       <slot />
     </main>
-    <AppBottomBar>
-      <div class="text-center text-caption text-pretty text-subtle *:inline-block">
+    <AppBottomBar class="px-4 pt-4 pb-10">
+      <div class="text-center text-caption text-pretty text-subtle max-w-[350px] mx-auto">
         <strong>Privacy & data:</strong>
-        <span> Session-only sign-in.</span>
-        <span> Data deleted 30 days post-event.</span>
+        <span> Authentication via Azure AD. Session-only. Data deleted 30 days post-event.</span>
       </div>
     </AppBottomBar>
   </div>

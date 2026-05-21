@@ -3,18 +3,16 @@ const model = defineModel<string>({ required: true })
 
 const props = withDefaults(
   defineProps<{
-    email?: string
-    variant?: 'otp' | 'confirm'
     error?: boolean
     errorMessage?: string
     disabled?: boolean
+    resendCountdown?: number | null
   }>(),
   {
-    email: '',
-    variant: 'otp',
     error: false,
     errorMessage: 'Invalid code. Try again',
     disabled: false,
+    resendCountdown: null,
   },
 )
 
@@ -28,10 +26,6 @@ const digits = computed(() => {
   const chars = model.value.split('').slice(0, OTP_LENGTH)
   return Array.from({ length: OTP_LENGTH }, (_, i) => chars[i] ?? '')
 })
-
-const title = computed(() =>
-  props.variant === 'confirm' ? 'Confirm email' : 'OTP Verification',
-)
 
 function focusInput() {
   hiddenInput.value?.focus()
@@ -61,30 +55,11 @@ function onPaste(event: ClipboardEvent) {
 </script>
 
 <template>
-  <div class="space-y-8">
-    <div class="space-y-2">
-      <h2 class="text-heading">
-        {{ title }}
-      </h2>
-      <p
-        v-if="variant === 'otp' && email"
-        class="text-secondary"
-      >
-        Please enter the code we just sent to email
-        <span class="font-bold">{{ email }}</span>
-      </p>
-      <p
-        v-else
-        class="text-secondary"
-      >
-        Enter the 6-digit code sent to your email
-      </p>
-    </div>
-
-    <div
-      class="glass-panel rounded-[20px] bg-white/20 px-6 pt-10 pb-8 space-y-8"
-      @click="focusInput"
-    >
+  <div
+    class="glass-panel rounded-[20px] bg-white/20 px-6 pt-10 pb-8 space-y-8 w-full"
+    @click="focusInput"
+  >
+    <div class="space-y-2 w-full">
       <div class="flex gap-2 justify-center">
         <div
           v-for="(digit, index) in digits"
@@ -101,36 +76,44 @@ function onPaste(event: ClipboardEvent) {
         </div>
       </div>
 
-      <input
-        ref="hiddenInput"
-        :value="model"
-        type="text"
-        inputmode="numeric"
-        autocomplete="one-time-code"
-        maxlength="6"
-        class="sr-only"
-        :disabled="disabled"
-        @input="onInput"
-        @keydown="onKeydown"
-        @paste="onPaste"
+      <p
+        v-if="resendCountdown != null && resendCountdown > 0"
+        class="text-center text-sm text-secondary"
       >
-
-      <div
-        v-if="error && errorMessage"
-        class="flex gap-2 items-start justify-center"
-        role="alert"
-      >
-        <Icon
-          name="amplif:alert-circle"
-          :size="16"
-          class="shrink-0 text-[#FF003B] mt-0.5"
-        />
-        <p class="text-caption font-bold text-[#FF003B] leading-4">
-          {{ errorMessage }}
-        </p>
-      </div>
-
-      <slot />
+        Resend code in
+        <span class="font-bold text-tertiary">{{ resendCountdown }}s</span>
+      </p>
     </div>
+
+    <input
+      ref="hiddenInput"
+      :value="model"
+      type="text"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+      maxlength="6"
+      class="sr-only"
+      :disabled="disabled"
+      @input="onInput"
+      @keydown="onKeydown"
+      @paste="onPaste"
+    >
+
+    <div
+      v-if="error && errorMessage"
+      class="flex gap-2 items-start justify-center"
+      role="alert"
+    >
+      <Icon
+        name="amplif:alert-circle"
+        :size="16"
+        class="shrink-0 text-[#FF003B] mt-0.5"
+      />
+      <p class="text-caption font-bold text-[#FF003B] leading-4">
+        {{ errorMessage }}
+      </p>
+    </div>
+
+    <slot />
   </div>
 </template>

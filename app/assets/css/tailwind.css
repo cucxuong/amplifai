@@ -34,6 +34,82 @@
   --color-tertiary: #D2D5DA;
   --color-subtle: #9CA3AF;
   --color-muted: #E5E7EB;
+
+  --ease-page: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fade-in: 280ms;
+  --animate-fade-in: fade-in var(--duration-fade-in) var(--ease-page) both;
+  --duration-heart-beat: 1.2s;
+  --animate-heart-beat: heart-beat var(--duration-heart-beat) ease-in-out infinite;
+  --duration-breath: 3.6s;
+  --ease-breath: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --animate-breath: breath var(--duration-breath) var(--ease-breath) infinite;
+  --duration-grow: 4s;
+  --delay-grow: 200ms;
+  --ease-grow: linear;
+  --direction-grow: normal;
+  --animate-grow: grow var(--duration-grow) var(--delay-grow) var(--ease-grow) infinite var(--direction-grow);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes heart-beat {
+
+  0%,
+  100% {
+    scale: 1;
+  }
+
+  20% {
+    scale: 1.045;
+  }
+
+  40% {
+    scale: 1;
+  }
+
+  60% {
+    scale: 1.045;
+  }
+
+  80% {
+    scale: 1;
+  }
+}
+
+@keyframes breath {
+
+  0%,
+  100% {
+    scale: 1;
+  }
+
+  50% {
+    scale: 1.045;
+  }
+}
+
+@keyframes grow {
+  0% {
+    scale: 0.75;
+    opacity: 0.5;
+  }
+
+  50% {
+    scale: 1;
+    opacity: 1;
+  }
+  100% {
+    scale: 1.05;
+    opacity: 0.5;
+  }
 }
 
 @layer base {
@@ -44,8 +120,10 @@
     --app-bottom-offset: env(safe-area-inset-bottom, 0px);
 
     --app-min-scroll-top: 62px;
+    --app-scroll-bottom: 98px;
+    --app-bottom-dock-height: 0px;
+    --app-wrapper-height: calc(100dvh + var(--app-min-scroll-top) + var(--app-scroll-bottom));
   }
-
 
   body,
   html {
@@ -54,185 +132,157 @@
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
-    background: var(--color-surface);
     color: var(--color-primary);
     min-height: 100dvh;
     scrollbar-color: transparent;
     scrollbar-width: none;
-    transition: background-image 0.2s ease-in-out, background-position 0.3s ease-in-out;
     @apply overscroll-none select-none;
   }
 
+  html {
+    background: #000;
+  }
+
   body {
+    min-height: var(--app-wrapper-height);
     background-size: cover;
-    background-position: 30% 0%;
     background-repeat: no-repeat;
+    transition:
+      background-color 280ms cubic-bezier(0.32, 0.72, 0, 1),
+      background-position 280ms cubic-bezier(0.32, 0.72, 0, 1),
+      background-size 280ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
-  body:has(#pick-persona-page) {
-    background-position: center center;
+  .app-wrapper {
+    @apply relative z-10 box-border flex min-h-0 w-dvw max-w-md mx-auto flex-col pt-(--app-min-scroll-top);
+    height: var(--app-wrapper-height);
   }
 
-  body:has(#slash-page) {
-    background-position: top right;
+  .app-bottom-spacer {
+    height: calc(var(--app-bottom-dock-height) + var(--app-scroll-bottom));
+    min-height: calc(var(--app-bottom-dock-height) + var(--app-scroll-bottom));
+    transition:
+      height 280ms cubic-bezier(0.32, 0.72, 0, 1),
+      min-height 280ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
-  /* Shell chrome stays fixed during tab / stack transitions */
-  .shell-chrome {
-    view-transition-name: shell-chrome;
+  .shell-nav {
+    background: transparent;
   }
 
-  .page-content {
-    view-transition-name: page-content;
+  .app-fixed-bottom {
+    @apply fixed bottom-0 left-1/2 z-30 w-full max-w-md -translate-x-1/2;
+    padding-bottom: calc(1rem + var(--app-bottom-offset));
   }
 
-  ::view-transition-group(shell-chrome) {
-    animation: none;
+  .agenda-scale-enter-active,
+  .agenda-scale-leave-active,
+  .fade-scale-in-enter-active,
+  .fade-scale-in-leave-active,
+  .fade-scale-out-enter-active,
+  .fade-scale-out-leave-active,
+  .slide-left-enter-active,
+  .slide-left-leave-active,
+  .slide-right-enter-active,
+  .slide-right-leave-active {
+    position: absolute;
+    inset: 0;
+    width: 100%;
   }
 
-  /* Default crossfade (root + unnamed) */
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 0.3s;
-    animation-fill-mode: both;
+  .agenda-scale-enter-active {
+    z-index: 2;
+    transition:
+      opacity 280ms 200ms cubic-bezier(0.32, 0.72, 0, 1),
+      scale 280ms 200ms cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: opacity, scale;
   }
 
-  /* Tab / scan crossfade — page content only */
-  html:active-view-transition-type(fade) {
-
-    &::view-transition-old(root),
-    &::view-transition-new(root) {
-      animation: none;
-    }
-
-    &::view-transition-old(page-content) {
-      animation: vt-fade-out 0.2s ease-out both;
-    }
-
-    &::view-transition-new(page-content) {
-      animation: vt-fade-in 0.2s ease-out both;
-      z-index: 1;
-    }
+  .agenda-scale-leave-active {
+    z-index: 1;
+    pointer-events: none;
+    transition:
+      opacity 220ms cubic-bezier(0.32, 0.72, 0, 1),
+      scale 220ms cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: opacity, scale;
   }
 
-  /* Forward stack push */
-  html:active-view-transition-type(slide-in) {
-
-    &::view-transition-old(root),
-    &::view-transition-new(root) {
-      animation: none;
-    }
-
-    &::view-transition-old(page-content) {
-      animation: vt-slide-out-left 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
-      z-index: 0;
-    }
-
-    &::view-transition-new(page-content) {
-      animation: vt-slide-in-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
-      z-index: 1;
-    }
+  .agenda-scale-enter-from,
+  .agenda-scale-leave-to {
+    opacity: 0;
+    scale: 0.92;
   }
 
-  /* Back stack pop */
-  html:active-view-transition-type(slide-out) {
-
-    &::view-transition-old(root),
-    &::view-transition-new(root) {
-      animation: none;
-    }
-
-    &::view-transition-old(page-content) {
-      animation: vt-slide-out-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
-      z-index: 1;
-    }
-
-    &::view-transition-new(page-content) {
-      animation: vt-slide-in-left 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
-      z-index: 0;
-    }
+  .fade-scale-in-enter-active,
+  .fade-scale-out-enter-active {
+    z-index: 2;
+    transition:
+      opacity 280ms 200ms cubic-bezier(0.32, 0.72, 0, 1),
+      scale 280ms 200ms cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: opacity, scale;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-
-    ::view-transition-old(root),
-    ::view-transition-new(root),
-    ::view-transition-old(page-content),
-    ::view-transition-new(page-content) {
-      animation-duration: 0.01ms !important;
-    }
+  .fade-scale-in-leave-active,
+  .fade-scale-out-leave-active {
+    z-index: 1;
+    pointer-events: none;
+    transition:
+      opacity 220ms cubic-bezier(0.32, 0.72, 0, 1),
+      scale 220ms cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: opacity, scale;
   }
 
-  @keyframes vt-fade-out {
-    from {
-      opacity: 1;
-    }
-
-    to {
-      opacity: 0;
-    }
+  .fade-scale-in-enter-from,
+  .fade-scale-out-enter-from {
+    opacity: 0;
+    scale: 1.06;
   }
 
-  @keyframes vt-fade-in {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
+  .fade-scale-in-leave-to,
+  .fade-scale-out-leave-to {
+    opacity: 0;
+    scale: 0.92;
   }
 
-  @keyframes vt-slide-out-left {
-    from {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    to {
-      opacity: 0.6;
-      transform: translateX(-32px);
-    }
+  .slide-left-enter-active,
+  .slide-right-enter-active {
+    z-index: 2;
+    transition: transform 280ms 200ms cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
-  @keyframes vt-slide-in-right {
-    from {
-      opacity: 0.6;
-      transform: translateX(32px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+  .slide-left-leave-active,
+  .slide-right-leave-active {
+    z-index: 1;
+    pointer-events: none;
+    transition: opacity 220ms cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: opacity;
   }
 
-  @keyframes vt-slide-out-right {
-    from {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    to {
-      opacity: 0.6;
-      transform: translateX(32px);
-    }
+  .slide-left-enter-from {
+    transform: translate3d(100%, 0, 0);
   }
 
-  @keyframes vt-slide-in-left {
-    from {
-      opacity: 0.6;
-      transform: translateX(-32px);
-    }
+  .slide-right-enter-from {
+    transform: translate3d(-100%, 0, 0);
+  }
 
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+  .slide-left-leave-to,
+  .slide-right-leave-to {
+    opacity: 0.72;
   }
 }
 
 @layer components {
+  .page-route-host {
+    @apply relative isolate flex min-h-0 flex-1 flex-col overflow-hidden;
+
+    &>* {
+      @apply relative flex min-h-0 flex-1 flex-col;
+    }
+  }
+
   .glass-panel {
     @apply rounded-[20px] backdrop-blur-xs relative transition-all;
     box-shadow: 0 4px 20px 0 rgba(0, 87, 255, 0.50) inset, 0 -4px 20px 0 rgba(255, 110, 0, 0.20) inset;

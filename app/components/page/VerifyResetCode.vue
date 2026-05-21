@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { authErrorMessage } from '~/utils/auth-errors'
 
+const RESEND_SECONDS = 20
+
 const route = useRoute()
 const email = computed(() => String(route.query.email ?? '').trim())
 const isDev = import.meta.dev
@@ -12,9 +14,13 @@ const password = ref('')
 const confirmPassword = ref('')
 const isVerifyingOtp = ref(false)
 const isSubmitting = ref(false)
+const isResending = ref(false)
 const otpError = ref(false)
 const formError = ref<string | null>(null)
 const passwordMismatch = ref(false)
+const resendCountdown = ref(0)
+
+let resendTimer: ReturnType<typeof setInterval> | null = null
 
 const canVerifyOtp = computed(
   () => email.value && code.value.trim().length === 6 && !isVerifyingOtp.value,
@@ -27,6 +33,18 @@ const canResetPassword = computed(
     && password.value === confirmPassword.value
     && !isSubmitting.value,
 )
+
+function startResendCountdown() {
+  resendCountdown.value = RESEND_SECONDS
+  if (resendTimer)
+    clearInterval(resendTimer)
+  resendTimer = setInterval(() => {
+    if (resendCountdown.value > 0)
+      resendCountdown.value -= 1
+    else if (resendTimer)
+      clearInterval(resendTimer)
+  }, 1000)
+}
 
 watch([password, confirmPassword], () => {
   passwordMismatch.value = Boolean(
@@ -44,6 +62,13 @@ watch(code, () => {
 onMounted(() => {
   if (!email.value)
     navigateTo('/sign-in/forgot-password')
+  else
+    startResendCountdown()
+})
+
+onUnmounted(() => {
+  if (resendTimer)
+    clearInterval(resendTimer)
 })
 
 async function verifyOtp() {
@@ -79,6 +104,28 @@ async function verifyOtp() {
   }
   finally {
     isVerifyingOtp.value = false
+  }
+}
+
+async function resendCode() {
+  if (resendCountdown.value > 0 || isResending.value || otpVerified.value)
+    return
+
+  formError.value = null
+  otpError.value = false
+  isResending.value = true
+  try {
+    await $fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      body: { email: email.value },
+    })
+    startResendCountdown()
+  }
+  catch (err: unknown) {
+    formError.value = authErrorMessage(err, 'Could not resend code. Try again.')
+  }
+  finally {
+    isResending.value = false
   }
 }
 
@@ -122,45 +169,86 @@ async function submitReset() {
 
 <template>
   <AuthScreen back-fallback="/sign-in/forgot-password">
-    <form
-      class="space-y-6"
-      @submit.prevent="otpVerified ? submitReset() : verifyOtp()"
-    >
-      <p
-        v-if="formError"
-        class="text-caption text-[#FF003B]"
-        role="alert"
-      >
-        {{ formError }}
-      </p>
-      <p
-        v-if="isDev"
-        class="text-caption text-subtle"
-      >
-        Dev: code is printed in the terminal as
-        <code class="text-tertiary">[smtp.service] sendOtpEmail</code>.
-      </p>
+    <template v-if="!otpVerified">
+      <div class="space-y-2">
+        <h2 class="text-heading">
+          Verify code
+        </h2>
+        <p class="text-secondary">
+          Enter the 6-digit code sent to {{ email }}
+        </p>
+      </div>
 
-      <AuthOtpInput
-        v-model="code"
-        variant="otp"
-        :email="email"
-        :error="otpError"
-        error-message="Invalid code. Try again"
-        :disabled="isVerifyingOtp || isSubmitting || otpVerified"
-      >
-        <AuthPrimaryButton
-          v-if="!otpVerified"
-          label="Verify"
-          :disabled="!canVerifyOtp"
-          :loading="isVerifyingOtp"
-        />
-      </AuthOtpInput>
+      <form @submit.prevent="verifyOtp">
+        <p
+          v-if="formError"
+          class="text-caption text-[#FF003B] mb-4"
+          role="alert"
+        >
+          {{ formError }}
+        </p>
+        <p
+          v-if="isDev"
+          class="text-caption text-subtle mb-4"
+        >
+          Demo: use OTP code <code class="text-tertiary">111111</code>.
+        </p>
 
-      <div
-        v-if="otpVerified"
-        class="space-y-2"
+        <AuthOtpInput
+          v-model="code"
+          :error="otpError"
+          error-message="Invalid code. Try again"
+          :disabled="isVerifyingOtp || isSubmitting"
+          :resend-countdown="resendCountdown"
+          @complete="verifyOtp"
+        >
+          <div class="space-y-3 w-full">
+            <AuthPrimaryButton
+              label="Verify"
+              :disabled="!canVerifyOtp"
+              :loading="isVerifyingOtp"
+            />
+            <p
+              v-if="resendCountdown === 0"
+              class="text-center text-sm text-secondary"
+            >
+              Don't receive OTP?
+              <button
+                type="button"
+                class="font-bold text-tertiary px-2 py-1 disabled:opacity-50"
+                :disabled="isResending"
+                @click="resendCode"
+              >
+                {{ isResending ? 'Sending…' : 'Resend' }}
+              </button>
+            </p>
+          </div>
+        </AuthOtpInput>
+      </form>
+    </template>
+
+    <template v-else>
+      <div class="space-y-2">
+        <h2 class="text-heading">
+          Enter new password
+        </h2>
+        <p class="text-secondary">
+          Choose a new password for your account
+        </p>
+      </div>
+
+      <form
+        class="space-y-0"
+        @submit.prevent="submitReset"
       >
+        <p
+          v-if="formError"
+          class="text-caption text-[#FF003B] mb-2"
+          role="alert"
+        >
+          {{ formError }}
+        </p>
+
         <AuthField
           v-model="password"
           label="New password"
@@ -185,14 +273,14 @@ async function submitReset() {
           :clearable="false"
         />
 
-        <div class="pt-4">
+        <div class="pt-8">
           <AuthPrimaryButton
             label="Reset password"
             :disabled="!canResetPassword"
             :loading="isSubmitting"
           />
         </div>
-      </div>
-    </form>
+      </form>
+    </template>
   </AuthScreen>
 </template>

@@ -1,9 +1,7 @@
 import { normalizeEmail, isValidEmail } from '../../services/auth/auth.service'
-import { isAuthBypassEnabled } from '../../services/auth/bypass'
 import { markEmailVerified } from '../../services/auth/credentials.service'
 import { verifyOtp, type OtpPurpose } from '../../services/auth/otp.service'
 import { issueResetToken } from '../../services/auth/reset-token.service'
-import { buildAuthSessionPayload, findUserByEmail } from '../../services/auth/users.store'
 
 interface VerifyOtpBody {
   email?: string
@@ -31,18 +29,7 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, message: 'Account not found' })
     }
 
-    if (isAuthBypassEnabled()) {
-      return { ok: true, redirectToSignIn: true }
-    }
-
-    const stored = await findUserByEmail(email)
-    if (!stored) {
-      throw createError({ statusCode: 404, message: 'Account not found' })
-    }
-
-    await setUserSession(event, buildAuthSessionPayload(stored))
-
-    return { ok: true }
+    return { ok: true, redirectToSignIn: true }
   }
 
   if (purpose === 'reset') {

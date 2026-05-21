@@ -6,10 +6,10 @@ const isPortrait = computed(() => height.value >= width.value)
 <template>
   <div
     id="slash-page"
-    class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)]"
   >
-    <AppTopBar>
-      <GlassPanel class="bg-[hsl(233_81_10/0.4)] p-4 px-5 flex items-center justify-between gap-4">
+    <AppTopBar class="px-4 py-2.5">
+      <div class="bg-[rgba(5,10,48,0.4)] rounded-[20px] p-4 px-5 flex items-center justify-between gap-4">
         <NuxtImg
           src="/brand-logo.svg"
           alt="L'Oréal-ONESINGAPORE"
@@ -24,7 +24,7 @@ const isPortrait = computed(() => height.value >= width.value)
           height="22"
           preload
         />
-      </GlassPanel>
+      </div>
     </AppTopBar>
 
     <main
@@ -37,32 +37,37 @@ const isPortrait = computed(() => height.value >= width.value)
           alt="AmplifAI"
           class="w-[min(22rem,80dvw)]"
         />
-        <div class="text-[20px] leading-[24px] font-sans font-normal">Powered by Tech & Data</div>
+        <div class="text-[20px] leading-[24px] font-sans font-normal">
+          Powered by Tech & Data
+        </div>
       </div>
 
-      <GlassPanel 
-        class="mt-8 mx-auto rounded-md p-2 px-3 bg-[hsl(233_81_10/0.2)] text-[20px] leading-[24px] font-sans font-normal text-center" 
+      <GlassPanel
+        class="mt-8 mx-auto rounded-md p-2 px-3 bg-[hsl(233_81_10/0.2)] text-[20px] leading-[24px] font-sans font-normal text-center"
         :deg="-30"
       >
-        <div class="absolute rounded-[inherit] bg-primary/5"/>
+        <div class="absolute rounded-[inherit] bg-primary/5" />
 
         02 - 05 June <br>
         Singapore
       </GlassPanel>
+      <AppBottomSpacer />
     </main>
-    <AppBottomBar class="pb-4 space-y-4">
-      <NuxtLink
-        href="/sign-in"
-        prefetch
-        class="flex justify-center w-full outline-none! p-5 py-3.5 rounded-[20px] font-bold leading-[24px] active:scale-[1.015] transition-all"
-        style="background: linear-gradient(135deg, #FF6E00 0%, #FF003B 100%);"
-      >
-        Get started
-      </NuxtLink>
-      <div class="text-center text-caption text-pretty text-subtle *:inline-block">
-        <span>INTERNAL · L'ORÉAL EMPLOYEES ONLY</span>
-      </div>
-    </AppBottomBar>
 
+    <AppFixedBottom class="px-4">
+      <AppBottomBar class="space-y-4">
+        <NuxtLink
+          href="/sign-in"
+          prefetch
+          class="flex justify-center w-full outline-none! px-5 py-3.5 rounded-[20px] font-bold leading-6 text-white active:scale-[1.015] transition-all"
+          style="background: linear-gradient(157.57deg, #FF6E00 0%, #FF003B 100%)"
+        >
+          Get started
+        </NuxtLink>
+        <div class="text-center text-caption text-pretty text-subtle">
+          INTERNAL · L'ORÉAL EMPLOYEES ONLY
+        </div>
+      </AppBottomBar>
+    </AppFixedBottom>
   </div>
 </template>

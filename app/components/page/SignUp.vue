@@ -123,7 +123,7 @@ async function submitSignUp() {
         :clearable="false"
       />
 
-      <div class="space-y-2 pt-4">
+      <div class="space-y-2 pt-8">
         <AuthPrimaryButton
           label="Sign Up"
           :disabled="!canSubmit"

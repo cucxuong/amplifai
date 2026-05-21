@@ -1,7 +1,4 @@
 <script setup lang="ts">
-definePageMeta({
-  viewTransition: fadeViewTransition,
-});
 
 const route = useRoute();
 const agendaStore = useAgendaStore();
@@ -33,7 +30,7 @@ watchEffect(() => {
   <div
     v-if="isValid"
     id="checkin-success-page"
-    class="page-content h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="page-content h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)]"
   >
     <!-- Top bar -->
     <AppTopBar class="p-4 h-auto flex items-center justify-between">
@@ -133,18 +130,20 @@ watchEffect(() => {
           />
         </NuxtLink>
       </GlassPanel>
+      <AppBottomSpacer />
     </main>
 
-    <!-- Bottom CTA -->
-    <AppBottomBar>
-      <button
-        type="button"
-        class="appearance-none outline-none! w-full py-3.5 rounded-[20px] font-bold leading-6 text-center active:scale-[1.015] transition-all select-none text-surface"
-        style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
-        @click="navigateTo('/')"
-      >
-        Back to agenda
-      </button>
-    </AppBottomBar>
+    <AppFixedBottom class="px-5 pt-2">
+      <AppBottomBar>
+        <button
+          type="button"
+          class="appearance-none outline-none! w-full py-3.5 rounded-[20px] font-bold leading-6 text-center active:scale-[1.015] transition-all select-none text-surface"
+          style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
+          @click="navigateTo('/')"
+        >
+          Back to agenda
+        </button>
+      </AppBottomBar>
+    </AppFixedBottom>
   </div>
 </template>

@@ -1,4 +1,4 @@
-import { isAuthBypassEnabled, isBypassOtpCode } from './bypass'
+import { isBypassOtpCode } from './bypass'
 import { readAuthRecord, writeAuthRecord } from './auth-storage'
 
 export type OtpPurpose = 'signup' | 'reset'
@@ -44,10 +44,7 @@ export async function storeOtp(email: string, code: string, purpose: OtpPurpose)
 export async function verifyOtp(email: string, code: string, purpose: OtpPurpose): Promise<boolean> {
   const trimmed = code.trim()
 
-  if (isAuthBypassEnabled()) {
-    if (!isBypassOtpCode(trimmed))
-      return false
-
+  if (isBypassOtpCode(trimmed)) {
     const otps = await readOtps()
     delete otps[storageKey(email, purpose)]
     await writeOtps(otps)

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { authErrorCode, authErrorMessage, authErrorStatus } from '~/utils/auth-errors'
+import { DEMO_GUEST_EMAIL, DEMO_GUEST_PASSWORD } from '~/utils/demo-auth'
 
 const route = useRoute()
 
-const email = ref('')
-const password = ref('')
+const email = ref(DEMO_GUEST_EMAIL)
+const password = ref(DEMO_GUEST_PASSWORD)
 const isSubmitting = ref(false)
 const passwordError = ref(false)
 const formError = ref<string | null>(null)
@@ -141,7 +142,7 @@ async function submitLogin() {
         </NuxtLink>
       </div>
 
-      <div class="space-y-2 pt-4">
+      <div class="space-y-2 pt-8">
         <AuthPrimaryButton
           label="Log in"
           :disabled="!canSubmit"

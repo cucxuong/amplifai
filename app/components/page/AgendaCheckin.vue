@@ -11,7 +11,7 @@ const emit = defineEmits<{
 <template>
   <div
     id="agenda-checkin-page"
-    class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)_auto]"
   >
     <!-- Top bar -->
     <AppTopBar class="p-4 h-auto flex items-center justify-end">
@@ -22,7 +22,10 @@ const emit = defineEmits<{
         class="appearance-none outline-none! size-11 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
         @click="emit('close')"
       >
-        <Icon name="amplif:x" :size="18" />
+        <Icon
+          name="amplif:x"
+          :size="18"
+        />
       </GlassPanel>
     </AppTopBar>
 
@@ -38,7 +41,7 @@ const emit = defineEmits<{
 
       <!-- Text -->
       <div class="text-center flex flex-col gap-1">
-        <h1 class="text-[2rem] font-bold leading-tight text-[#F3F4F6]">
+        <h1 class="text-[2rem] font-bold leading-tight text-primary">
           Checked in.
         </h1>
         <p
@@ -50,7 +53,7 @@ const emit = defineEmits<{
             background-clip: text;
           "
         >
-          +{{ props.item.sparks }} Sparks added<br />to your wallet
+          +{{ props.item.sparks }} Sparks added<br >to your wallet
         </p>
       </div>
 
@@ -69,18 +72,18 @@ const emit = defineEmits<{
             <div class="flex flex-col gap-1 min-w-0">
               <span
                 class="text-[10px] leading-none tracking-[0.15em] uppercase font-bold text-tertiary"
-                >Source</span
-              >
+              >Source</span>
               <span class="font-bold text-label leading-snug truncate">{{
                 props.item.title
               }}</span>
             </div>
             <!-- Sparks count -->
             <div class="flex items-center gap-1 shrink-0">
-              <span class="text-[2rem] font-bold leading-none text-primary"
-                >+{{ props.item.sparks }}</span
-              >
-              <NuxtImg src="/activity-star.png" class="size-8 object-cover" />
+              <span class="text-[2rem] font-bold leading-none text-primary">+{{ props.item.sparks }}</span>
+              <NuxtImg
+                src="/activity-star.png"
+                class="size-8 object-cover"
+              />
             </div>
           </div>
 
@@ -90,11 +93,14 @@ const emit = defineEmits<{
           <!-- View wallet link -->
           <NuxtLink
             to="/sparks"
-            class="flex items-center justify-center gap-1.5 p-4 pt-3 font-bold text-label active:opacity-70 transition-opacity text-[#D2D5DA]"
+            class="flex items-center justify-center gap-1.5 p-4 pt-3 font-bold text-label active:opacity-70 transition-opacity text-tertiary"
             @click="emit('close')"
           >
             View Sparks wallet
-            <Icon name="amplif:arrow-right" :size="16" />
+            <Icon
+              name="amplif:arrow-right"
+              :size="16"
+            />
           </NuxtLink>
         </GlassPanel>
       </div>

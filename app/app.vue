@@ -3,6 +3,13 @@ const APP_MIN_SCROLL_TOP_VAR = '--app-min-scroll-top'
 
 usePageBodyBackground()
 
+const pageTransitionName = usePageTransitionName()
+
+const pageTransition = computed(() => ({
+  name: pageTransitionName.value,
+  mode: 'out-in' as const,
+}))
+
 const minScrollTopRaw = useCssVar(APP_MIN_SCROLL_TOP_VAR)
 
 const minScrollTop = computed(
@@ -14,17 +21,22 @@ const { y: scrollY } = useWindowScroll({ behavior: 'instant' })
 useBlockUserWindowScroll()
 usePortraitOrientationLock()
 
-/** Programmatic peek offset only; user scroll blocked on html/body. */
-watch(() => scrollY.value !== minScrollTop.value, (y) => {
-  if (y)
+/** Safari full-bleed: 62px programmatic scroll peek — do not replace with fixed bg layers. */
+watch(() => scrollY.value !== minScrollTop.value, (off) => {
+  if (off)
     scrollY.value = minScrollTop.value
 }, { immediate: true })
 </script>
 
 <template>
-  <div class="pt-(--app-min-scroll-top) pb-25 w-dvw max-w-md mx-auto">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
+  <div class="app-wrapper">
+    <div class="page-route-host min-h-0 flex-1">
+      <NuxtLayout>
+        <NuxtPage
+          :transition="pageTransition"
+          :page-key="(route) => route.path"
+        />
+      </NuxtLayout>
+    </div>
   </div>
 </template>

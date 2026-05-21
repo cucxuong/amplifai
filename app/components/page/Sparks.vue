@@ -49,30 +49,18 @@ const totalEarned = 240;
 const currentScore = 180;
 const maxScore = 240;
 
-const { goBack } = useAppBack('/agenda');
 </script>
 
 <template>
   <div
     id="sparks-page"
-    class="page-content h-dvh flex flex-col"
+    class="page-content h-full min-h-0 flex flex-col"
   >
     <!-- Score header — sits on top of the body background image -->
     <div class="flex flex-col shrink-0 px-5 pb-8">
       <!-- Back button -->
       <AppTopBar class="px-0">
-        <GlassPanel
-          as="button"
-          type="button"
-          :deg="-45"
-          class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
-          @click="goBack"
-        >
-          <Icon
-            name="amplif:arrow-left"
-            :size="24"
-          />
-        </GlassPanel>
+        <UiBackButton fallback="/agenda" />
       </AppTopBar>
 
       <!-- Rank badge -->
@@ -172,9 +160,9 @@ const { goBack } = useAppBack('/agenda');
               "
             >
               <span>+{{ item.sparks }}</span>
-              <Icon
-                name="amplif:ai-colored"
-                :size="14"
+              <NuxtImg
+                src="/ai-colored.svg"
+                class="size-4 object-cover"
               />
             </div>
             <div
@@ -182,9 +170,9 @@ const { goBack } = useAppBack('/agenda');
               class="flex items-center gap-0.5 font-bold text-[14px] leading-[18px] text-[#FF003B]"
             >
               <span>{{ item.sparks }}</span>
-              <Icon
-                name="amplif:ai-colored"
-                :size="14"
+              <NuxtImg
+                src="/ai-colored.svg"
+                class="size-4 object-cover"
               />
             </div>
             <span class="text-caption text-[#0B0F17]">Sparks</span>

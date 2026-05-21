@@ -5,11 +5,14 @@ const props = defineProps<{
 }>()
 
 const { complete } = useQrScanCheckIn(() => props.sessionId)
-const { goBack } = useAppBack('/agenda')
 
 const videoRef = ref<HTMLVideoElement | null>(null)
 const isHandling = ref(false)
 const scanUiStatus = ref<'searching' | 'invalid'>('searching')
+const showManualCode = ref(false)
+const manualCode = ref('')
+const manualCodeError = ref(false)
+const isSubmittingManualCode = ref(false)
 
 const { status: scannerStatus, start, stop } = useQrScanner({
   videoRef,
@@ -43,9 +46,44 @@ function handleDecode(text: string) {
 }
 
 function useCodeInstead() {
-  const path = props.sessionId ? `/scan/code/${props.sessionId}` : '/scan/code'
-  navigateTo(path)
+  showManualCode.value = true
 }
+
+function closeManualCode() {
+  showManualCode.value = false
+  manualCode.value = ''
+  manualCodeError.value = false
+  if (!isHandling.value)
+    start()
+}
+
+function submitManualCode() {
+  if (!manualCode.value.trim() || isSubmittingManualCode.value)
+    return
+
+  manualCodeError.value = false
+  isSubmittingManualCode.value = true
+
+  if (!complete(manualCode.value)) {
+    manualCodeError.value = true
+  }
+  else {
+    isHandling.value = true
+    stop()
+    showManualCode.value = false
+  }
+
+  isSubmittingManualCode.value = false
+}
+
+watch(manualCode, () => {
+  manualCodeError.value = false
+})
+
+watch(showManualCode, (open) => {
+  if (open)
+    stop()
+})
 
 watch(
   videoRef,
@@ -61,26 +99,14 @@ onUnmounted(() => stop())
 <template>
   <div
     id="scan-qr-page"
-    class="page-content h-dvh bg-black grid grid-rows-[auto_minmax(0,1fr)]"
+    class="page-content fixed inset-0 z-20 bg-black grid grid-rows-[auto_minmax(0,1fr)]"
   >
     <AppTopBar class="px-4 py-2.5 h-auto flex items-center">
-      <GlassPanel
-        as="button"
-        type="button"
-        :deg="-45"
-        class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 grid place-content-center active:scale-110 select-none"
-        style="background: rgba(255, 255, 255, 0.2)"
-        @click="goBack"
-      >
-        <Icon
-          name="amplif:arrow-left"
-          :size="24"
-        />
-      </GlassPanel>
+      <UiBackButton fallback="/agenda" />
     </AppTopBar>
 
     <main
-      class="flex flex-col items-center justify-between px-4 pt-6 pb-10 min-h-0"
+      class="flex flex-col items-center justify-between px-4 pt-6 pb-[max(2.5rem,env(safe-area-inset-bottom))] min-h-0"
     >
       <div class="flex flex-col items-center gap-12 w-full shrink-0">
         <div class="flex flex-col gap-2 text-center w-full">
@@ -159,6 +185,15 @@ onUnmounted(() => stop())
         Use code instead
       </button>
     </main>
+
+    <PageScanCodeManual
+      v-model:open="showManualCode"
+      v-model="manualCode"
+      :error="manualCodeError"
+      :submitting="isSubmittingManualCode"
+      @close="closeManualCode"
+      @submit="submitManualCode"
+    />
   </div>
 </template>
 

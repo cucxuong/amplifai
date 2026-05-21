@@ -1,6 +1,5 @@
 <template>
-  <main :class="cn('flex flex-col overflow-y-auto overflow-x-clip', $attrs.class)">
+  <div :class="cn('flex flex-col', $attrs.class)">
     <slot />
-    <div class="pb-22.5"/>
-  </main>
+  </div>
 </template>

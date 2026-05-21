@@ -1,8 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
 const { clear } = useUserSession()
-const { goBack } = useAppBack('/agenda')
-
 const isAgendaHome = computed(() => route.path === '/agenda')
 const isMe = computed(() => route.path.startsWith('/me'))
 const isGift = computed(() => route.path.startsWith('/gift'))
@@ -18,47 +16,57 @@ async function signOut() {
 <template>
   <div
     id="home-page"
-    class="h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="flex flex-col h-full min-h-0"
+    :class="{ 'overflow-y-auto overflow-x-clip overscroll-contain': !isAgendaHome }"
   >
-    <header class="shell-chrome">
-      <AppTopBar class="p-5 py-6 h-auto">
-        <PageHomeUserSummary v-if="isAgendaHome" />
+    <AppTopBar
+      class="shell-header z-20 p-5 py-6 h-auto"
+      :class="{ 'sticky top-0': !isAgendaHome }"
+    >
+      <PageHomeUserSummary v-if="isAgendaHome" />
 
-        <GlassPanel
-          v-else-if="isMe || isGift"
-          as="button"
-          type="button"
-          :deg="-45"
-          class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
-          @click="goBack"
-        >
-          <Icon
-            name="amplif:arrow-left"
-            :size="24"
-          />
-        </GlassPanel>
-      </AppTopBar>
-    </header>
+      <UiBackButton
+        v-else-if="isMe || isGift"
+        fallback="/agenda"
+      />
+    </AppTopBar>
 
-    <main class="page-content min-h-0 overflow-hidden">
+    <main
+      class="page-content relative min-h-0"
+      :class="{ 'overflow-y-auto overflow-x-clip overscroll-contain': isAgendaHome }"
+    >
       <slot />
+      <AppBottomSpacer />
     </main>
 
-    <footer
-      v-if="!isGift"
-      class="shell-chrome fixed bottom-0 inset-x-0 z-10"
-    >
-      <AppBottomBar class="p-5 py-4">
+    <AppFixedBottom class="shell-nav px-4 pt-4">
+      <AppBottomBar>
         <PageHomeNavBar v-if="showNavBar" />
+        
         <button
           v-if="isMe"
           type="button"
-          class="appearance-none outline-none! h-13 flex items-center justify-center text-center bg-primary/20 rounded-[20px] backdrop-blur-xs font-bold w-full mt-auto"
+          class="appearance-none outline-none! h-13 flex items-center justify-center text-center bg-primary/20 rounded-[20px] font-bold w-full mt-auto"
           @click="signOut"
         >
           Sign out
         </button>
+      
+        <div
+          v-if="isGift"
+          class="flex flex-col gap-4"
+        >
+          <button
+            type="button"
+            class="appearance-none outline-none! h-13 w-full flex items-center justify-center rounded-[20px] text-base font-bold text-white active:scale-[1.02] select-none transition-transform"
+            style="background: linear-gradient(158deg, #FF6E00 0%, #FF003B 100%)"
+            @click="navigateTo('/scan')"
+          >Scan QR code</button>
+          <p class="text-caption leading-4 text-secondary text-center">
+            ✨ Bonus: Redeeming prizes will NOT impact your final leaderboard score.
+          </p>
+        </div>
       </AppBottomBar>
-    </footer>
+    </AppFixedBottom>
   </div>
 </template>

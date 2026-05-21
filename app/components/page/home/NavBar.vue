@@ -1,19 +1,25 @@
 <script setup lang="ts">
 const { activeTab, APP_NAV_ITEMS } = useHomeNav()
+const { navigateForward } = useNavigationIntent()
+
+onMounted(() => {
+  for (const route of ['/gift', '/scan', '/me'] as const)
+    void preloadRouteComponents(route)
+})
 
 function selectNav(name: AppNav) {
   switch (name) {
     case AppNav.AGENDA:
-      navigateTo('/agenda')
+      navigateForward('/agenda')
       break
     case AppNav.ME:
-      navigateTo('/me')
+      navigateForward('/me')
       break
     case AppNav.SCAN:
-      navigateTo('/scan')
+      navigateForward('/scan')
       break
     case AppNav.GIFT:
-      navigateTo('/gift')
+      navigateForward('/gift')
       break
   }
 }

@@ -8,7 +8,7 @@ const props = withDefaults(
     icon?: string
     placeholder?: string
     autocomplete?: string
-    inputmode?: string
+    inputmode?: 'search' | 'email' | 'tel' | 'url' | 'none' | 'numeric' | 'decimal'
     disabled?: boolean
     error?: boolean
     errorMessage?: string
@@ -62,7 +62,7 @@ function clearValue() {
         :autocomplete="autocomplete"
         :inputmode="inputmode"
         :disabled="disabled"
-        class="appearance-none outline-none! flex-1 min-w-0 bg-transparent text-base leading-[18px] placeholder:text-tertiary"
+        class="auth-field-input appearance-none outline-none! flex-1 min-w-0 bg-transparent text-base leading-[18px] placeholder:text-tertiary"
         :class="model ? 'text-primary' : 'text-tertiary'"
       >
       <button
@@ -108,3 +108,14 @@ function clearValue() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.auth-field-input:-webkit-autofill,
+.auth-field-input:-webkit-autofill:hover,
+.auth-field-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-primary);
+  caret-color: var(--color-primary);
+  transition: background-color 99999s ease-out;
+  box-shadow: 0 0 0 1000px transparent inset;
+}
+</style>

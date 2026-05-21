@@ -19,7 +19,7 @@ const personaImg = computed(() => {
           v-if="personaImg"
           :src="personaImg"
           alt=""
-          class="size-full object-cover object-center"
+          class="size-[90px] object-cover object-center"
         />
         <Icon
           v-else

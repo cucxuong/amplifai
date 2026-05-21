@@ -86,10 +86,6 @@ export default defineNuxtConfig({
     },
   },
 
-  experimental: {
-    viewTransition: true,
-  },
-
   // HTTPS: use `npm run dev` (.cursor/scripts/dev-https.mjs → nuxt --https).
   // mkcert files in .cert/ are passed via --https.key / --https.cert when present.
   vite: {
@@ -115,16 +111,13 @@ export default defineNuxtConfig({
   css: ['./app/assets/css/tailwind.css'],
 
   app: {
-    viewTransition: {
-      enabled: true,
-      types: ['fade'],
-    },
     head: {
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'manifest', href: '/manifest.webmanifest' },
       ],
       meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'theme-color', content: '#000' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
       ],

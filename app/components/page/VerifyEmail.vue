@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { authErrorMessage } from '~/utils/auth-errors'
 
+const RESEND_SECONDS = 20
+
 const route = useRoute()
 const email = computed(() => String(route.query.email ?? '').trim())
 
@@ -10,16 +12,37 @@ const isResending = ref(false)
 const otpError = ref(false)
 const formError = ref<string | null>(null)
 const resendMessage = ref<string | null>(null)
+const resendCountdown = ref(0)
 
 const isDev = import.meta.dev
+let resendTimer: ReturnType<typeof setInterval> | null = null
 
 const canSubmit = computed(
   () => email.value && code.value.trim().length === 6 && !isSubmitting.value,
 )
 
+function startResendCountdown() {
+  resendCountdown.value = RESEND_SECONDS
+  if (resendTimer)
+    clearInterval(resendTimer)
+  resendTimer = setInterval(() => {
+    if (resendCountdown.value > 0)
+      resendCountdown.value -= 1
+    else if (resendTimer)
+      clearInterval(resendTimer)
+  }, 1000)
+}
+
 onMounted(() => {
   if (!email.value)
     navigateTo('/sign-up')
+  else
+    startResendCountdown()
+})
+
+onUnmounted(() => {
+  if (resendTimer)
+    clearInterval(resendTimer)
 })
 
 async function verifyEmail() {
@@ -46,13 +69,7 @@ async function verifyEmail() {
       return
     }
 
-    const ok = await refreshAuthSession()
-    if (!ok) {
-      formError.value = 'Session could not be started. Try again.'
-      return
-    }
-
-    await navigateTo('/')
+    formError.value = 'Verification succeeded but redirect failed. Sign in manually.'
   }
   catch (err: unknown) {
     const message = authErrorMessage(err, 'Verification failed. Try again.')
@@ -69,6 +86,9 @@ async function verifyEmail() {
 }
 
 async function resendCode() {
+  if (resendCountdown.value > 0 || isResending.value)
+    return
+
   formError.value = null
   otpError.value = false
   resendMessage.value = null
@@ -81,6 +101,7 @@ async function resendCode() {
     resendMessage.value = isDev
       ? 'New code sent — check the dev server terminal.'
       : 'A new code has been sent to your email.'
+    startResendCountdown()
   }
   catch (err: unknown) {
     formError.value = authErrorMessage(err, 'Could not resend code. Try again.')
@@ -96,6 +117,15 @@ async function resendCode() {
     page-id="sign-up-verify-page"
     back-fallback="/sign-up"
   >
+    <div class="space-y-2">
+      <h2 class="text-heading">
+        Confirm email
+      </h2>
+      <p class="text-secondary">
+        Enter the 6-digit code sent to your email
+      </p>
+    </div>
+
     <form @submit.prevent="verifyEmail">
       <p
         v-if="formError"
@@ -114,16 +144,15 @@ async function resendCode() {
         v-if="isDev"
         class="text-caption text-subtle mb-4"
       >
-        Dev: code is printed in the terminal as
-        <code class="text-tertiary">[smtp.service] sendOtpEmail</code>.
+        Demo: use OTP code <code class="text-tertiary">111111</code>.
       </p>
 
       <AuthOtpInput
         v-model="code"
-        variant="confirm"
         :error="otpError"
         error-message="Invalid code. Try again"
         :disabled="isSubmitting"
+        :resend-countdown="resendCountdown"
         @complete="verifyEmail"
       >
         <div class="space-y-3 w-full">
@@ -132,7 +161,10 @@ async function resendCode() {
             :disabled="!canSubmit"
             :loading="isSubmitting"
           />
-          <p class="text-center text-sm text-secondary">
+          <p
+            v-if="resendCountdown === 0"
+            class="text-center text-sm text-secondary"
+          >
             Don't receive OTP?
             <button
               type="button"

@@ -63,7 +63,7 @@ async function sendCode() {
         :disabled="isSubmitting"
       />
 
-      <div class="pt-4">
+      <div class="pt-8">
         <AuthPrimaryButton
           label="Send code"
           :disabled="!canSubmit"

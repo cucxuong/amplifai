@@ -47,27 +47,15 @@ const LEADER_BOARD_PLAYERS: LeaderBoardPlayerRow[] = [
   },
 ]
 
-const { goBack } = useAppBack('/agenda')
 </script>
 
 <template>
   <div
     id="leader-board-page"
-    class="page-content h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="page-content h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)_auto]"
   >
     <AppTopBar class="p-4 py-2.5 h-auto z-10">
-      <GlassPanel
-        as="button"
-        type="button"
-        :deg="-45"
-        class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
-        @click="goBack"
-      >
-        <Icon
-          name="amplif:arrow-left"
-          :size="24"
-        />
-      </GlassPanel>
+      <UiBackButton fallback="/agenda" />
     </AppTopBar>
 
     <main class="flex flex-col">
@@ -78,7 +66,7 @@ const { goBack } = useAppBack('/agenda')
         </div>
       </div>
 
-      <div class="bottom-[50dvh] px-4 fixed inset-x-0 top-0 isolate z-0">
+      <div class="bottom-[50dvh] px-4 fixed inset-x-0 top-0 isolate z-0 after:content-[''] after:absolute after:inset-x-0 after:top-0 after:h-16 after:bg-linear-to-b after:from-black after:to-black/0">
         <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 z-0">
           <div
             inert
@@ -140,7 +128,9 @@ const { goBack } = useAppBack('/agenda')
           />
           <div class="absolute inset-0 flex items-end justify-center text-[40px] font-bold text-[rgb(243,244,246)]/20 pb-8 z-1">2</div>
           <div class="absolute bottom-[calc(100%-12px)] left-1/2 -translate-x-1/2 isolate z-1">
-            <UiRankBg rank="2" />
+            <UiRankBg
+              rank="2"
+            />
             <NuxtImg
               src="/rank-2-avatar.jpg"
               class="size-[73px] object-cover rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -169,7 +159,9 @@ const { goBack } = useAppBack('/agenda')
           />
           <div class="absolute inset-0 flex items-end justify-center text-[40px] font-bold text-[rgb(243,244,246)]/20 pb-8 z-1">3</div>
           <div class="absolute bottom-[calc(100%-12px)] left-1/2 -translate-x-1/2 isolate z-1">
-            <UiRankBg rank="3" />
+            <UiRankBg
+              rank="3"
+            />
             <NuxtImg
               src="/rank-3-avatar.jpg"
               class="size-[73px] object-cover rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"

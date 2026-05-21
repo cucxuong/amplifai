@@ -1,11 +1,7 @@
 <script setup lang="ts">
-definePageMeta({
-  viewTransition: stackViewTransition,
-});
 
 const route = useRoute();
 const store = useAgendaStore();
-const { goBack } = useAppBack('/agenda');
 const { isInUserCalendar, toggleSchedule: toggleUserSchedule } =
   useAgendaSchedule();
 
@@ -60,22 +56,11 @@ function handleCheckIn() {
   <div
     v-if="item"
     id="agenda-detail-page"
-    class="page-content h-dvh grid grid-rows-[auto_minmax(0,1fr)_auto]"
+    class="page-content h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)]"
   >
     <!-- Top bar -->
     <AppTopBar class="p-4 h-auto flex items-center">
-      <GlassPanel
-        as="button"
-        type="button"
-        :deg="-45"
-        class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
-        @click="goBack"
-      >
-        <Icon
-          name="amplif:arrow-left"
-          :size="24"
-        />
-      </GlassPanel>
+      <UiBackButton fallback="/agenda" />
     </AppTopBar>
 
     <!-- Scrollable content -->
@@ -188,26 +173,28 @@ function handleCheckIn() {
           </div>
         </div>
       </div>
+      <AppBottomSpacer />
     </main>
 
-    <!-- Bottom CTA -->
-    <AppBottomBar class="flex flex-col gap-3">
-      <button
-        type="button"
-        class="appearance-none outline-none! w-full py-3.5 rounded-[20px] font-bold leading-6 text-center active:scale-[1.015] transition-all select-none text-white"
-        style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
-        @click="handleCheckIn"
-      >
-        Scan QR to check in
-      </button>
-      <button
-        type="button"
-        class="appearance-none outline-none! w-full py-2 text-center font-bold leading-6 active:opacity-70 transition-opacity select-none"
-        :class="isInMySchedule ? 'text-subtle' : 'text-primary'"
-        @click="toggleSchedule"
-      >
-        {{ isInMySchedule ? "Remove from my schedule" : "Save to my schedule" }}
-      </button>
-    </AppBottomBar>
+    <AppFixedBottom class="px-5 pt-2">
+      <AppBottomBar class="flex flex-col gap-3">
+        <button
+          type="button"
+          class="appearance-none outline-none! w-full py-3.5 rounded-[20px] font-bold leading-6 text-center active:scale-[1.015] transition-all select-none text-white"
+          style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
+          @click="handleCheckIn"
+        >
+          Scan QR to check in
+        </button>
+        <button
+          type="button"
+          class="appearance-none outline-none! w-full py-2 text-center font-bold leading-6 active:opacity-70 transition-opacity select-none"
+          :class="isInMySchedule ? 'text-subtle' : 'text-primary'"
+          @click="toggleSchedule"
+        >
+          {{ isInMySchedule ? "Remove from my schedule" : "Save to my schedule" }}
+        </button>
+      </AppBottomBar>
+    </AppFixedBottom>
   </div>
 </template>

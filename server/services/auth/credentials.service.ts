@@ -1,7 +1,7 @@
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
 import { isValidEmail, normalizeEmail } from './auth.service'
-import { isAuthBypassEnabled } from './bypass'
+import { isAuthBypassEnabled, isDemoGuestLogin, DEMO_GUEST_EMAIL, DEMO_GUEST_PASSWORD } from './bypass'
 import {
   displayName,
   findUserByEmail,
@@ -107,11 +107,47 @@ export async function register(input: RegisterInput): Promise<StoredUser> {
   return user
 }
 
+async function ensureDemoGuestUser(): Promise<StoredUser> {
+  const existing = await findUserByEmail(DEMO_GUEST_EMAIL)
+  if (existing) {
+    if (!existing.emailVerified) {
+      const updated = await updateUser(DEMO_GUEST_EMAIL, { emailVerified: true })
+      if (updated)
+        return updated
+    }
+    return existing
+  }
+
+  const { hash, salt } = await hashPassword(DEMO_GUEST_PASSWORD)
+  const user: StoredUser = {
+    email: DEMO_GUEST_EMAIL,
+    firstName: 'Guest',
+    lastName: 'User',
+    passwordHash: hash,
+    passwordSalt: salt,
+    emailVerified: true,
+    onboardingComplete: false,
+    personaId: null,
+    createdAt: Date.now(),
+  }
+  await saveUser(user)
+  return user
+}
+
 export async function loginWithPassword(
   email: string,
   password: string,
 ): Promise<{ ok: true, user: AuthUserResult } | { ok: false, reason: LoginFailureReason }> {
   const normalized = normalizeEmail(email)
+
+  if (isDemoGuestLogin(normalized, password)) {
+    const user = await ensureDemoGuestUser()
+    return {
+      ok: true,
+      user: { email: user.email, name: displayName(user) },
+    }
+  }
+
   const user = await findUserByEmail(normalized)
   if (!user)
     return { ok: false, reason: 'not_found' }

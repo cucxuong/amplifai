@@ -8,10 +8,10 @@ const props = defineProps<{
   <div class="p-4 pb-5 grid grid-cols-2 gap-3">
     <NuxtLink
       href="/sparks"
-      class="block"
+      class="grid touch-manipulation select-none transition-transform active:scale-[1.05]"
     >
       <GlassPanel
-        class="p-2 py-2.5 flex items-center gap-0.5 active:scale-[1.03] transition-all"
+        class="p-2 py-2.5 flex items-center gap-0.5"
         style="background: linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)), rgb(255 255 255 / 0.1);"
       >
         <NuxtImg
@@ -31,30 +31,34 @@ const props = defineProps<{
       </GlassPanel>
     </NuxtLink>
 
-    <GlassPanel
-      class="p-2 py-2.5 flex items-center gap-0.5"
-      style="background: linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)), rgb(255 255 255 / 0.1);"
-      @click="navigateTo('/leader-board')"
+    <NuxtLink
+      href="/leader-board"
+      class="grid touch-manipulation select-none transition-transform active:scale-[1.05]"
     >
-      <NuxtImg
-        src="/star.png"
-        class="size-9 object-cover"
-      />
-      <div class="flex flex-col gap-1.5 flex-1">
-        <span class="text-[11px] leading-[14px] text-secondary uppercase">RANK</span>
-        <span><span class="text-[24px] leading-[28px] font-bold">#14</span></span>
-      </div>
-      <GlassPanel class="appearance-none outline-none! size-7 rounded-4xl p-0 [--light-deg:-45deg] bg-primary/20 grid place-content-center active:scale-110 select-none mb-auto">
-        <Icon
-          name="amplif:arrow-up-right"
-          :size="12"
+      <GlassPanel
+        class="p-2 py-2.5 flex items-center gap-0.5"
+        style="background: linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)), rgb(255 255 255 / 0.1);"
+      >
+        <NuxtImg
+          src="/star.png"
+          class="size-9 object-cover"
         />
+        <div class="flex flex-col gap-1.5 flex-1">
+          <span class="text-[11px] leading-[14px] text-secondary uppercase">RANK</span>
+          <span><span class="text-[24px] leading-[28px] font-bold">#14</span></span>
+        </div>
+        <GlassPanel class="appearance-none outline-none! size-7 rounded-4xl p-0 [--light-deg:-45deg] bg-primary/20 grid place-content-center select-none mb-auto">
+          <Icon
+            name="amplif:arrow-up-right"
+            :size="12"
+          />
+        </GlassPanel>
       </GlassPanel>
-    </GlassPanel>
+    </NuxtLink>
 
     <GlassPanel
       v-if="props.showActivities"
-      class="col-span-full p-2.5 pt-3 flex items-center gap-3"
+      class="col-span-full p-2.5 pt-3 flex items-center gap-3 select-none touch-manipulation transition-transform active:scale-[1.05]"
       style="background: linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)), rgb(255 255 255 / 0.1);"
     >
       <div class="size-12 aspect-square rounded-full overflow-hidden glass-panel grid place-content-center bg-primary/20">

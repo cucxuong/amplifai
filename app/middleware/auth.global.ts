@@ -1,11 +1,14 @@
 const PUBLIC_PREFIXES = ['/', '/sign-in', '/sign-up']
-const AUTH_HOME = '/agenda'
-
 export default defineNuxtRouteMiddleware((to) => {
-  if (to.path === '/pick-persona' || to.path.startsWith('/pick-persona/'))
-    return navigateTo('/')
-
   const { loggedIn } = useUserSession()
+
+  if (to.path === '/pick-persona' || to.path.startsWith('/pick-persona/')) {
+    if (!loggedIn.value)
+      return navigateTo('/sign-in')
+    return
+  }
+
+  const AUTH_HOME = '/agenda'
   const isPublic = PUBLIC_PREFIXES.some(
     p => to.path === p || to.path.startsWith(`${p}/`),
   )

@@ -7,6 +7,10 @@ const personaImg = computed(() => {
   const persona = PERSONAS.find(p => p.id === session.value?.personaId)
   return persona?.image
 })
+
+function openPickPersona() {
+  navigateTo('/pick-persona')
+}
 </script>
 
 <template>
@@ -19,17 +23,22 @@ const personaImg = computed(() => {
         {{ new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).replace(/,/g, ' · ') }}
       </div>
     </div>
-    <div class="rounded-full aspect-square size-12.5 overflow-hidden bg-[#000D42]/10 outline-6 outline-primary/10 grid place-content-center">
+    <button
+      type="button"
+      class="appearance-none bg-[#000D42]/10 grid place-content-center active:scale-110 transition-transform rounded-full size-12.5 outline-6 outline-primary/10"
+      aria-label="Change persona"
+      @click="openPickPersona"
+    >
       <NuxtImg
         v-if="personaImg"
         :src="personaImg"
-        class="rounded-full size-full object-cover object-center"
+        class="rounded-full size-12.5 object-cover object-center"
       />
       <Icon
         v-else
         name="amplif:profile"
         :size="24"
       />
-    </div>
+    </button>
   </div>
 </template>

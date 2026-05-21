@@ -12,16 +12,15 @@ const { goBack } = useAppBack(() => props.fallback)
 </script>
 
 <template>
-  <GlassPanel
-    as="button"
+  <button
     type="button"
-    :deg="-45"
-    class="appearance-none outline-none! size-11 shrink-0 rounded-4xl p-0 bg-primary/5 grid place-content-center active:scale-110 select-none"
+    class="glass-panel appearance-none outline-none! size-11 shrink-0 rounded-full bg-white/20 p-2.5 shadow-[0_4px_8px_rgba(0,0,0,0.04)] grid place-content-center active:scale-110 select-none transition-transform"
     @click="goBack"
   >
     <Icon
       name="amplif:arrow-left"
       :size="24"
+      class="text-primary"
     />
-  </GlassPanel>
+  </button>
 </template>
