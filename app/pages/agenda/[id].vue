@@ -21,10 +21,7 @@ watchEffect(() => {
  */
 const isLive = computed(() => {
   if (!item.value || item.value.alwaysOn) return false;
-  if (store.isAgendaItemLive(item.value)) return true;
-  const date = item.value.startAt.slice(0, 10);
-  const dayItems = store.itemsByDate(date);
-  return dayItems[0]?.id === item.value.id;
+  return store.isAgendaItemLive(item.value);
 });
 
 const startDate = computed(() =>
