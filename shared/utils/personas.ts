@@ -5,7 +5,7 @@ export interface Persona {
 }
 
 function personaAsset(filename: string): string {
-  return `/persona/${filename}`
+  return `/${filename}`
 }
 
 export const PERSONAS: Persona[] = [
