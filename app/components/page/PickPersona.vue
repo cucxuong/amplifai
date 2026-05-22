@@ -50,6 +50,8 @@ async function skip() {
 function selectPersona(id: string) {
   selectedId.value = id
 }
+
+const isCompletedOnboarding = computed(() => session.value?.onboardingComplete)
 </script>
 
 <template>
@@ -58,7 +60,7 @@ function selectPersona(id: string) {
     class="h-dvh min-h-0 grid grid-rows-[auto_minmax(0,1fr)]"
   >
     <AppTopBar
-      v-if="loggedIn"
+      v-if="loggedIn && isCompletedOnboarding"
       class="px-4 py-2.5 h-auto"
     >
       <UiBackButton :fallback="backFallback" />

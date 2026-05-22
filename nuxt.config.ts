@@ -141,6 +141,13 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/',
     head: {
+      script: [
+        {
+          key: 'app-scroll-pin',
+          innerHTML: `(function(){try{var s=getComputedStyle(document.documentElement);var t=parseFloat(s.getPropertyValue('--app-min-scroll-top'))||62;window.scrollTo(0,t);document.documentElement.classList.add('app-scroll-pinned')}catch(e){}})();`,
+          tagPosition: 'head',
+        },
+      ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'manifest', href: '/manifest.webmanifest' },
