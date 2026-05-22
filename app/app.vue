@@ -1,36 +1,36 @@
 <script setup lang="ts">
-const APP_MIN_SCROLL_TOP_VAR = '--app-min-scroll-top'
-
 usePageBodyBackground()
 
 const pageTransitionName = usePageTransitionName()
+const { scrollPinReady, pinScrollSync, getMinScrollTop, scrollY } = useAppScrollPin()
 
 const pageTransition = computed(() => ({
   name: pageTransitionName.value,
   mode: 'out-in' as const,
+  onBeforeEnter() {
+    pinScrollSync()
+  },
 }))
-
-const minScrollTopRaw = useCssVar(APP_MIN_SCROLL_TOP_VAR)
-
-const minScrollTop = computed(
-  () => Number.parseFloat(minScrollTopRaw.value ?? '62') || 62,
-)
-
-const { y: scrollY } = useWindowScroll({ behavior: 'instant' })
 
 useBlockUserWindowScroll()
 usePortraitOrientationLock()
 
-/** Safari full-bleed: 62px programmatic scroll peek — do not replace with fixed bg layers. */
-watch(() => scrollY.value !== minScrollTop.value, (off) => {
-  if (off)
-    scrollY.value = minScrollTop.value
-}, { immediate: true })
+/** Safari full-bleed: correct drift only after pin is verified (not during navigation). */
+watch(
+  () => scrollPinReady.value && Math.abs(scrollY.value - getMinScrollTop()) > 0.5,
+  (drifted) => {
+    if (drifted)
+      scrollY.value = getMinScrollTop()
+  },
+)
 </script>
 
 <template>
   <div class="app-wrapper">
-    <div class="page-route-host min-h-0 flex-1">
+    <div
+      class="page-route-host min-h-0 flex-1"
+      :class="{ invisible: !scrollPinReady }"
+    >
       <NuxtLayout>
         <NuxtPage
           :transition="pageTransition"

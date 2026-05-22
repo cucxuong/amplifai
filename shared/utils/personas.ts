@@ -11,8 +11,8 @@ function personaAsset(filename: string): string {
 export const PERSONAS: Persona[] = [
   { id: 'the-ai-innovator', label: 'The AI Innovator', image: personaAsset('the-ai-innovator.png') },
   { id: 'the-beauty-explorer', label: 'The Beauty Explorer', image: personaAsset('the-beauty-explorer.png') },
-  { id: 'the-data-pup', label: 'The Data Pup', image: personaAsset('the-data-pup.png') },
-  { id: 'the-explorer', label: 'The Explorer', image: personaAsset('the-explorer.png') },
+  { id: 'the-data-unicorn', label: 'The Data Unicorn', image: personaAsset('the-data-unicorn.png') },
+  { id: 'the-pathfinder', label: 'The Pathfinder', image: personaAsset('the-explorer.png') },
   { id: 'the-future-visitor', label: 'The Future Visitor', image: personaAsset('the-future-visitor.png') },
   { id: 'the-spark-kitten', label: 'The Spark Kitten', image: personaAsset('the-spark-kitten.png') },
   { id: 'the-tech-strategist', label: 'The Tech Strategist', image: personaAsset('the-tech-strategist.png') },
