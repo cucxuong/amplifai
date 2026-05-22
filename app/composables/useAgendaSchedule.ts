@@ -7,6 +7,7 @@ export function useAgendaSchedule() {
 
   onMounted(() => {
     void agenda.fetchSessions()
+    void currentUser.fetchSchedule()
   })
 
   function isInUserCalendar(itemOrId: AgendaItem | string): boolean {

@@ -51,7 +51,13 @@ export const useAgendaStore = defineStore('agenda', () => {
     error.value = null
     try {
       const api = useApi()
+      // Real API returns unwrapped array via server route proxy
       const sessions = await api.get<import('#shared/types/minisite').MinisiteSession[]>('/api/minisite/sessions')
+
+      if (!Array.isArray(sessions)) {
+        throw new Error(`Expected array of sessions, got ${typeof sessions}`)
+      }
+
       items.value = sessions.map(mapSessionToAgendaItem)
       fetched.value = true
     }
