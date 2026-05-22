@@ -19,6 +19,8 @@ logs
 .fleet
 .idea
 .cursor
+!.cursor/scripts/
+!.cursor/scripts/verify-cf-build.mjs
 
 # Local env files
 .env

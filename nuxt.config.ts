@@ -136,6 +136,17 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'cloudflare-pages',
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true,
+    },
+    // https://github.com/nitrojs/nitro/issues/3271
+    unenv: {
+      alias: {
+        'string_decoder/': 'node:string_decoder',
+        'process/': 'node:process',
+      },
+    },
   },
 
   routeRules: {

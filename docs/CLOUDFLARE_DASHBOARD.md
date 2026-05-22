@@ -12,6 +12,10 @@ Apply in **Workers & Pages → amplifai → Settings**.
 
 Do **not** use `npm run generate`.
 
+After changing build config, **clear build cache** (Pages → Settings → Build) and redeploy. Purge CDN cache if assets still 404 from a prior bad deploy.
+
+`npm run build` runs a **postbuild check** that fails if `dist/_nuxt/`, `_routes.json`, or `_worker.js` are missing.
+
 ## Environment variables
 
 ### Shared (Production + Preview)
@@ -49,12 +53,17 @@ Register **Production** Reply URL / Entity ID in Azure AD — use the custom dom
 
 ```text
 GET https://YOUR-PROJECT.pages.dev/api/minisite/sessions
+GET https://YOUR-PROJECT.pages.dev/global-bg.png
+GET https://YOUR-PROJECT.pages.dev/_nuxt/<hash>.css   # from page source
 ```
 
-| Response | Meaning |
-|----------|---------|
-| JSON or 502 | Worker OK — fix minisite if 502 |
-| HTML 404 | Wrong build output or missing `cloudflare-pages` preset |
+| URL / response | Meaning |
+|----------------|---------|
+| `/api/minisite/sessions` → JSON or 502 | Worker OK — fix minisite if 502 |
+| `/global-bg.png` → 200 | Public static assets uploaded |
+| `/_nuxt/*.css` → 200 | Client bundles served (not Worker 404) |
+| Sign-in page styled | CSS + JS loaded |
+| HTML 404 on `/api/*` | Wrong build output or missing `cloudflare-pages` preset |
 | 403 on sign-in | Set `NUXT_AUTH_BYPASS=true` (preview) or configure SAML (prod) |
 | 500 on auth routes | Missing `NUXT_SESSION_PASSWORD` |
 
