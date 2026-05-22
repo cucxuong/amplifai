@@ -179,7 +179,7 @@ function handleCheckIn() {
     <AppFixedBottom class="px-5 pt-2">
       <AppBottomBar class="flex flex-col gap-3">
         <UiCTAButton @click="handleCheckIn">
-          Scan QR to check in
+          Scan QR for completion and sparks
         </UiCTAButton>
         <button
           type="button"
@@ -187,7 +187,7 @@ function handleCheckIn() {
           :class="isInMySchedule ? 'text-subtle' : 'text-primary'"
           @click="toggleSchedule"
         >
-          {{ isInMySchedule ? "Remove from my schedule" : "Save to my schedule" }}
+          {{ isInMySchedule ? "Remove from my schedule" : "Sign up and save to my schedule" }}
         </button>
       </AppBottomBar>
     </AppFixedBottom>

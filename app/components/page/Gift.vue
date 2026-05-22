@@ -13,7 +13,7 @@ const infoRows: Array<{ icon: string, render: () => VNode }> = [
     icon: 'amplif:scan-bold',
     render: () => h('p', { class: rowTextClass }, [
       'Visit the redemption booth at ',
-      h('strong', 'Level 47'),
+      h('strong', 'Level 47 Cafe'),
       ' and scan the QR code on the tablet to claim your prize.',
     ]),
   },
@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
         :class="{ 'is-ready': isCopyReady }"
       >
         <h1 class="text-[32px] leading-9 font-bold text-primary">
-          UNLOCK YOUR AI REWARDS 🚀
+          UNLOCK YOUR REWARDS 🚀
         </h1>
         <p class="text-base leading-5 text-tertiary">
           Turn your points into exclusive prizes!
