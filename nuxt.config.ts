@@ -116,6 +116,9 @@ export default defineNuxtConfig({
     ...(devHttpsEnabled && hasDevCertFiles()
       ? { server: { https: resolveDevHttps() } }
       : {}),
+    build: {
+      sourcemap: false,
+    },
   },
 
   modules: [
@@ -130,6 +133,10 @@ export default defineNuxtConfig({
   ],
 
   css: ['./app/assets/css/tailwind.css'],
+
+  nitro: {
+    preset: 'cloudflare-pages',
+  },
 
   routeRules: {
     '/sign-up': { redirect: { to: '/sign-in', statusCode: 301 } },

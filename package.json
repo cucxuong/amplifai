@@ -8,6 +8,8 @@
     "dev:http": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "pages:preview": "npm run build && wrangler pages dev dist",
+    "pages:deploy": "npm run build && wrangler pages deploy dist",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."

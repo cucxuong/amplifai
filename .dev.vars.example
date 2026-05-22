@@ -1,0 +1,5 @@
+# Copy to .dev.vars for `npm run pages:preview` / wrangler pages dev (never commit .dev.vars)
+NUXT_SESSION_PASSWORD=change-me-32-chars-minimum
+NUXT_MINISITE_API_BASE=https://minisite-roan.vercel.app
+NUXT_AUTH_BYPASS=true
+# NUXT_MINISITE_PUBLIC_API_KEY=

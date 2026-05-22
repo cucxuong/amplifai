@@ -103,6 +103,47 @@ Agenda, leaderboard, and gift-shop catalog load through the **same-origin** Nuxt
 
 My-schedule favorites stay in `localStorage` until minisite adds a schedule API.
 
+## Cloudflare Pages deployment
+
+This app requires **Nitro server routes** (`/api/*`). Do **not** use `npm run generate` for production — that drops API handlers and causes **404** on `/api/minisite/*`.
+
+### Pages build settings (Git integration)
+
+| Setting | Value |
+|---------|--------|
+| Build command | `npm run build` |
+| Build output directory | `dist` (confirm in build logs; use `.output/public` only if the log says so) |
+| Node.js version | Set env `NODE_VERSION=20` |
+
+Repo includes [`wrangler.toml`](wrangler.toml) with `nodejs_compat` (SAML / Node APIs) and `pages_build_output_dir = "dist"`.
+
+### Required environment variables (Cloudflare dashboard)
+
+See **[docs/CLOUDFLARE_DASHBOARD.md](docs/CLOUDFLARE_DASHBOARD.md)** for Preview vs Production env matrix.
+
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `NUXT_SESSION_PASSWORD` | Yes | 32+ chars |
+| `NUXT_MINISITE_API_BASE` | Yes | e.g. `https://minisite-roan.vercel.app` |
+| `NUXT_MINISITE_PUBLIC_API_KEY` | If minisite uses `PUBLIC_API_KEY` | Match minisite env |
+| `NUXT_AUTH_BYPASS` | Preview: `true` / Production: `false` | Mock sign-in vs real SAML |
+| `NUXT_SAML_ENTITY_ID` / `NUXT_SAML_ACS_URL` | Per environment | `*.pages.dev` for preview; custom domain for prod |
+| `NUXT_SAML_IDP_SSO_URL` / `NUXT_SAML_IDP_CERT` | Production SAML | From IT |
+
+### Local Cloudflare smoke test
+
+```bash
+cp .dev.vars.example .dev.vars   # edit secrets
+npm run pages:preview
+# GET http://localhost:8788/api/minisite/sessions — should not be 404
+```
+
+### Post-deploy checks
+
+1. `GET https://YOUR-SITE.pages.dev/api/minisite/sessions` → JSON (not HTML 404)
+2. Sign-in works (bypass or SAML per env)
+3. Agenda loads without repeated Network errors on `/api/*`
+
 ## Setup
 
 Make sure to install dependencies:
