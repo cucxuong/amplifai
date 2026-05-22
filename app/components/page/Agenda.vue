@@ -109,10 +109,9 @@ const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && ag
           class="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-3"
         >
           <PageHomeAgendaCard
-            v-for="(agenda, index) in agendaItems"
+            v-for="agenda in agendaItems"
             :key="agenda.id"
             :agenda="agenda"
-            :live="index === 0"
           />
         </div>
 

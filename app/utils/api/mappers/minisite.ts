@@ -42,16 +42,17 @@ export function mapLeaderboardEntry(
   entry: MinisiteLeaderboardEntry,
   currentUserId?: string | null,
 ): LeaderboardRow {
+  const mongoId = entry._id ?? entry.id ?? ''
   const name = entry.displayName?.trim()
     || `${entry.firstName} ${entry.lastName}`.trim()
     || 'Participant'
   return {
-    id: entry._id,
-    name: entry._id === currentUserId ? 'You' : name,
+    id: mongoId,
+    name: mongoId === currentUserId ? 'You' : name,
     img: entry.avatarUrl ?? '/player-3.jpg',
     score: entry.sparks,
     rank: entry.rank,
-    isYou: entry._id === currentUserId,
+    isYou: mongoId !== '' && mongoId === currentUserId,
   }
 }
 

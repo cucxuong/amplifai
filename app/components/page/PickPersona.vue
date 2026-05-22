@@ -3,7 +3,6 @@ import { PERSONAS } from '#shared/utils/personas'
 
 const { session, loggedIn } = useUserSession()
 const { completeOnboarding } = useMinisiteAuth()
-const { unavailable } = useMinisiteStatus()
 
 const backFallback = '/agenda'
 
@@ -13,7 +12,7 @@ const formError = ref<string | null>(null)
 const showSkip = computed(() => !session.value?.onboardingComplete)
 
 async function confirmPersona() {
-  if (!selectedId.value || isSubmitting.value || unavailable.value)
+  if (!selectedId.value || isSubmitting.value)
     return
   isSubmitting.value = true
   formError.value = null
@@ -109,7 +108,7 @@ function selectPersona(id: string) {
     <AppFixedBottom class="px-4">
       <AppBottomBar class="space-y-3">
         <UiCTAButton
-          :disabled="!selectedId || isSubmitting || unavailable"
+          :disabled="!selectedId || isSubmitting"
           @click="confirmPersona"
         >
           Continue

@@ -1,88 +1,55 @@
-# AmplifAI — session handoff (2026-05-21)
+# AmplifAI — session handoff
 
 Resume here on another machine after `git pull`. Do **not** commit `.env` / `.env.local` (secrets).
 
 ---
 
-## Current blocker (local dev minisite 401)
+## Architecture (current)
 
-**Symptom:** `PATCH /api/minisite/me` → 401, or sign-in warning "event backend not linked".
+**Amplifai auth:** SAML SSO or dev bypass (`NUXT_AUTH_BYPASS`) — amplifai session only (email, persona, onboarding). No SSO bridge to minisite on login.
 
-**Root cause:** Amplifai session missing `minisiteToken` because SSO bridge to minisite failed at login.
+**Read-only event data:** Nuxt BFF `GET /api/minisite/sessions|leaderboard|products` proxies to minisite **`/api/public/*`** (`proxyMinisitePublicGet`). No JWT. Optional **`NUXT_MINISITE_PUBLIC_API_KEY`** only if minisite sets `PUBLIC_API_KEY`.
 
-**Bridge flow:**
-1. Dev bypass / SAML → `buildSessionWithMinisiteBridge()` in `server/services/minisite/bridge.service.ts`
-2. POST minisite `/api/auth/sso-bridge` with `X-Internal-Key`
-3. On success, store `minisiteToken` in sealed session
-4. BFF routes use `requireMinisiteToken()` → proxies to minisite with Bearer JWT
+**Writes / personalised minisite data:** Routes that still use `requireMinisiteToken` (`/api/minisite/me`, check-in, orders, QR redeem) need a **`minisiteToken`** on the amplifai session. That token is **not** issued anymore by amplifai (bridge removed). These features stay blocked until minisite auth is plugged in separately (e.g. login/register JWT or restored bridge).
 
-**Already implemented (in this commit):**
-- Dev bridge failure logs: `[minisite-bridge] SSO bridge failed`
-- Lazy re-bridge in `requireMinisiteToken` when token missing
-- `dev-session` returns `{ minisiteLinked: boolean }`
-- Sign-in / PickPersona / user store 401 handling + `MinisiteUnavailableBanner`
+**Key server files:**
+- Payload after sign-in: `server/services/minisite/session.service.ts` (`buildUserSessionPayload`)
+- BFF proxy: `server/utils/minisite-client.ts`, `server/api/minisite/`
 
 ---
 
-## Env setup (local machine — not in git)
-
-### amplifai `.env.local`
-
-Required (recreate after pull on new PC):
+## amplifai `.env.local` (not in git)
 
 ```env
-NUXT_AUTH_BYPASS=true
 NUXT_SESSION_PASSWORD=<32+ chars>
-NUXT_MINISITE_API_BASE=http://localhost:3001
-NUXT_MINISITE_INTERNAL_KEY=9WbqXrvbPOnOiH3D0kvicaU+pSu9q8bD+vIgATX9kLY=
+NUXT_MINISITE_API_BASE=https://minisite-roan.vercel.app
+# NUXT_MINISITE_PUBLIC_API_KEY=...   # if minisite enables PUBLIC_API_KEY
+NUXT_AUTH_BYPASS=true   # dev only — false / unset on prod with SAML
 ```
 
-### minisite `.env.local` (separate repo)
-
-**Still needed:** `MONGODB_URI` (MongoDB Atlas connection string).
-
-```env
-MONGODB_URI=mongodb+srv://...
-NEXTAUTH_URL=http://localhost:3001
-NEXTAUTH_SECRET=<any dev secret>
-JWT_SECRET=<same or different>
-SSO_BRIDGE_INTERNAL_KEY=9WbqXrvbPOnOiH3D0kvicaU+pSu9q8bD+vIgATX9kLY=
-```
-
-Keys must match between amplifai `NUXT_MINISITE_INTERNAL_KEY` and minisite `SSO_BRIDGE_INTERNAL_KEY`.
+Local minisite: set `NUXT_MINISITE_API_BASE=http://localhost:3001` (or matching port).
 
 ---
 
-## Important discovery
+## Amplifai Vercel (production checklist)
 
-- Default `https://minisite-roan.vercel.app` is **not** under Vercel team `cucxuongs-projects` — requires unknown `SSO_BRIDGE_INTERNAL_KEY`.
-- Your minisite project: **`cucxuongs-projects/minisite`** (linked via `vercel link` in minisite folder).
-- `SSO_BRIDGE_INTERNAL_KEY` was added to minisite Vercel (development + production) with the key above.
+| Variable | Production |
+|----------|------------|
+| `NUXT_SESSION_PASSWORD` | Required (32+ chars) |
+| `NUXT_MINISITE_API_BASE` | `https://minisite-roan.vercel.app` (or set explicitly) |
+| `NUXT_MINISITE_PUBLIC_API_KEY` | Optional — match minisite `PUBLIC_API_KEY` if set |
+| `NUXT_AUTH_BYPASS` | `false` when SAML is live |
+| `NUXT_SAML_IDP_SSO_URL` / `NUXT_SAML_IDP_CERT` | From IT when SAML goes live |
 
-**Local dev path (recommended until MongoDB + deploy):**
-1. minisite: `npm run dev:3001` (port 3001)
-2. amplifai: `npm run dev` (port 3000 HTTPS)
-3. Sign out → sign in after env changes
+**Smoke:** minisite public API should return data server-side:
 
-**Smoke test:**
-```bash
-curl -X POST http://localhost:3001/api/auth/sso-bridge \
-  -H "Content-Type: application/json" \
-  -H "X-Internal-Key: 9WbqXrvbPOnOiH3D0kvicaU+pSu9q8bD+vIgATX9kLY=" \
-  -d '{"email":"dev.user@loreal.com","firstName":"Dev","lastName":"User"}'
-```
-Expect `"success":true`. 500 = missing `MONGODB_URI`. 401 = key mismatch.
+`curl https://minisite-roan.vercel.app/api/public/sessions`
 
 ---
 
-## TODO tomorrow
+## minisite repo (optional local)
 
-- [ ] Get `MONGODB_URI` (Atlas or team-provided) → paste into minisite `.env.local`
-- [ ] Restart minisite (`npm run dev:3001`) + amplifai dev server
-- [ ] Sign out, dev bypass sign-in → confirm no "backend not linked" warning
-- [ ] Pick persona → should PATCH `/api/minisite/me` without 401
-- [ ] Optional: deploy minisite to Vercel, set `MONGODB_URI` + keys there, point `NUXT_MINISITE_API_BASE` to deploy URL
-- [ ] Optional: add same minisite env vars to amplifai Vercel project for preview/prod
+Separate clone for running your own backend. Public routes need MongoDB (`MONGODB_URI`) on deployed minisite. See minisite repo docs for full env.
 
 ---
 
@@ -90,47 +57,21 @@ Expect `"success":true`. 500 = missing `MONGODB_URI`. 401 = key mismatch.
 
 | Repo | Remote |
 |------|--------|
-| amplifai (frontend + BFF) | this repo — `git pull` on new machine |
-| minisite (backend API) | GitHub `thilyvu/minisite` — separate clone |
-
----
-
-## Work completed this session (code)
-
-- Minisite BFF: `/api/minisite/*`, Pinia stores, composables, mappers
-- Removed legacy email/OTP auth UI + server routes
-- SAML + dev bypass → minisite bridge
-- QR scan: minisite codes, performance (ROI decode, BarcodeDetector, prefetch zxing)
-- Typecheck fixes (`shared/auth.d.ts`, SAML, minisite-client)
-- Minisite 401 diagnostics + lazy re-bridge + client UX
-
----
-
-## Key files
-
-| Area | Files |
-|------|-------|
-| Bridge | `server/services/minisite/bridge.service.ts` |
-| BFF proxy | `server/utils/minisite-client.ts`, `server/api/minisite/` |
-| Auth session | `server/api/auth/dev-session.post.ts`, `shared/auth.d.ts` |
-| Client stores | `app/stores/user.ts`, `checkIn.ts`, `agenda.ts`, `leaderboard.ts` |
-| Sign-in UX | `app/components/page/SignIn.vue` |
-| Persona | `app/components/page/PickPersona.vue` |
-| Env docs | `.env.example`, `README.md` |
+| amplifai (frontend + BFF) | this repo |
+| minisite (backend API) | separate clone |
 
 ---
 
 ## Dev commands
 
 ```powershell
-# Terminal 1 — minisite
-cd path/to/minisite
-npm install   # first time only
-npm run dev:3001
-
-# Terminal 2 — amplifai
+# amplifai
 cd path/to/amplifai
 npm run dev
+
+# Optional: local minisite (other terminal)
+cd path/to/minisite
+npm run dev -- -p 3001
 ```
 
-After pull on new PC: recreate `.env.local` files from sections above (copy securely — not via git).
+Recreate `.env.local` locally after pull (never commit secrets).

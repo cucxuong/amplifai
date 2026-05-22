@@ -66,7 +66,9 @@ export interface MinisiteMeResponse {
 
 export interface MinisiteLeaderboardEntry {
   rank: number
-  _id: string
+  /** Authenticated leaderboard uses Mongo `_id`; public leaderboard uses string `id`. */
+  _id?: string
+  id?: string
   firstName: string
   lastName: string
   displayName?: string
@@ -77,7 +79,8 @@ export interface MinisiteLeaderboardEntry {
 
 export interface MinisiteLeaderboardResponse {
   leaderboard: MinisiteLeaderboardEntry[]
-  myRank: number | null
+  /** Omitted by public leaderboard. */
+  myRank?: number | null
   total: number
 }
 
@@ -87,10 +90,13 @@ export interface MinisiteProduct {
   description?: string
   category: string
   price: number
-  imageUrl?: string
-  isAvailable?: boolean
+  /** Minisite field name */
+  photoUrl?: string | null
+  icon?: string
   physical?: boolean
   stock?: number | null
+  imageUrl?: string
+  isAvailable?: boolean
 }
 
 export interface MinisiteOrderItem {
@@ -121,14 +127,4 @@ export interface MinisiteQrRedeemResult {
   category: string
   amount: number
   currentSparks: number
-}
-
-export interface MinisiteBridgeUser {
-  id: string
-  persona?: string | null
-}
-
-export interface MinisiteBridgeData {
-  token: string
-  user: MinisiteBridgeUser
 }

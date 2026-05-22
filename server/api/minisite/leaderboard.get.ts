@@ -1,3 +1,3 @@
 export default defineEventHandler(async (event) => {
-  return proxyMinisiteGet(event, 'leaderboard')
+  return proxyMinisitePublicGet(event, 'public/leaderboard')
 })

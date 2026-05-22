@@ -5,7 +5,8 @@ import type { MinisiteApiEnvelope, MinisitePaginatedEnvelope } from '#shared/typ
 interface MinisiteFetchOptions {
   method?: string
   token?: string
-  internalKey?: string
+  /** When minisite sets PUBLIC_API_KEY; forwarded as X-API-Key. */
+  publicApiKey?: string
   query?: Record<string, unknown>
   body?: Record<string, unknown>
 }
@@ -35,7 +36,7 @@ export async function minisiteFetch<T>(
       method: (options.method ?? 'GET') as 'GET' | 'POST' | 'PATCH' | 'DELETE',
       headers: {
         ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
-        ...(options.internalKey ? { 'X-Internal-Key': options.internalKey } : {}),
+        ...(options.publicApiKey ? { 'X-API-Key': options.publicApiKey } : {}),
       },
       query: options.query,
       body: options.body,
@@ -61,7 +62,7 @@ export async function minisiteFetchPaginated<T>(
       method: (options.method ?? 'GET') as 'GET' | 'POST' | 'PATCH' | 'DELETE',
       headers: {
         ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
-        ...(options.internalKey ? { 'X-Internal-Key': options.internalKey } : {}),
+        ...(options.publicApiKey ? { 'X-API-Key': options.publicApiKey } : {}),
       },
       query: options.query,
       body: options.body,
@@ -83,11 +84,6 @@ export async function requireMinisiteToken(event: H3Event): Promise<string> {
   if (typeof token === 'string' && token)
     return token
 
-  const { tryRebridgeMinisiteSession } = await import('../services/minisite/bridge.service')
-  const rebridged = await tryRebridgeMinisiteSession(event, session)
-  if (rebridged)
-    return rebridged
-
   throw createError({
     statusCode: 401,
     message: 'Minisite session is missing — sign in again',
@@ -97,6 +93,15 @@ export async function requireMinisiteToken(event: H3Event): Promise<string> {
 export async function proxyMinisiteGet<T>(event: H3Event, path: string): Promise<T> {
   const token = await requireMinisiteToken(event)
   return minisiteFetch<T>(path, { token, query: getQuery(event) })
+}
+
+export async function proxyMinisitePublicGet<T>(event: H3Event, path: string): Promise<T> {
+  const config = useRuntimeConfig()
+  const key = typeof config.minisitePublicApiKey === 'string' ? config.minisitePublicApiKey.trim() : ''
+  return minisiteFetch<T>(path, {
+    query: getQuery(event),
+    ...(key ? { publicApiKey: key } : {}),
+  })
 }
 
 export async function proxyMinisitePost<T>(event: H3Event, path: string): Promise<T> {

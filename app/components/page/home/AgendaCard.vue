@@ -1,9 +1,8 @@
 <script setup lang="ts">
 const props = defineProps<{
   agenda: AgendaItem
-  live?: boolean
 }>()
-const isLive = computed(() => isAgendaItemLive(props.agenda) || props.live)
+const isLive = computed(() => isAgendaItemLive(props.agenda))
 </script>
 <template>
   <NuxtLink

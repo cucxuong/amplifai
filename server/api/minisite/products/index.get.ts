@@ -1,3 +1,3 @@
 export default defineEventHandler(async (event) => {
-  return proxyMinisiteGet(event, 'products')
+  return proxyMinisitePublicGet(event, 'public/products')
 })

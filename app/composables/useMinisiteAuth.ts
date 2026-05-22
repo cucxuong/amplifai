@@ -29,8 +29,18 @@ export function useMinisiteAuth() {
       await refreshAuthSession()
       return
     }
-    if (body.personaId)
-      await updateProfile({ persona: body.personaId })
+    if (body.personaId) {
+      const token = typeof session.value?.minisiteToken === 'string' ? session.value.minisiteToken : ''
+      if (token)
+        await updateProfile({ persona: body.personaId })
+      else {
+        await $fetch('/api/user/onboarding', {
+          method: 'POST',
+          body: { personaId: body.personaId, onboardingComplete: true },
+        })
+        await refreshAuthSession()
+      }
+    }
   }
 
   return {

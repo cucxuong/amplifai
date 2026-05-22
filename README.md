@@ -69,6 +69,8 @@ When bypass is on, auth data is stored **in memory** (resets on cold start). Pro
 
 ### iOS Safari / LAN dev testing
 
+If `npm run dev` fails with **Cannot find module** `...\dev-https.mjs`, add `.cursor/scripts/dev-https.mjs` locally (`.cursor/` is gitignored — copy from another machine) or run **`npm run dev:http`** for plain HTTP.
+
 `npm run dev` serves **HTTPS** on `0.0.0.0:3000` for camera QR and secure session cookies on iPhone.
 
 1. Terminal prints **Network** URLs — on iPhone open `https://192.168.x.x:3000` (same Wi‑Fi).
@@ -80,33 +82,24 @@ Production must use real HTTPS; session cookies stay `Secure`.
 
 ## Minisite API (BFF)
 
-Participant data (agenda, sparks, check-in, leaderboard, gift shop) is loaded via a **Nuxt BFF** at `/api/minisite/*`. The browser never calls minisite directly; Nitro forwards requests with a server-stored minisite JWT after SAML login.
+Agenda, leaderboard, and gift-shop catalog load through the **same-origin** Nuxt BFF at `/api/minisite/sessions`, `/api/minisite/leaderboard`, and `/api/minisite/products`. Nitro forwards them (server-side) to the minisite **`/api/public/*`** endpoints on `NUXT_MINISITE_API_BASE` — no JWT, no SSO bridge.
 
 | Variable | Scope | Purpose |
 |----------|-------|---------|
-| `NUXT_MINISITE_API_BASE` | server only | Minisite origin, e.g. `https://minisite-roan.vercel.app` |
-| `NUXT_MINISITE_INTERNAL_KEY` | server only | Shared with minisite `SSO_BRIDGE_INTERNAL_KEY` for user sync |
+| `NUXT_MINISITE_API_BASE` | server only | Minisite origin, default `https://minisite-roan.vercel.app` |
+| `NUXT_MINISITE_PUBLIC_API_KEY` | server only | Optional — only when minisite enables `PUBLIC_API_KEY` |
 
-After SAML ACS (or dev bypass), amplifai calls minisite `POST /api/auth/sso-bridge` and stores `minisiteToken` in the sealed session. Pinia stores call same-origin BFF routes only.
+**Amplifai Vercel (production)**
 
-### Local dev setup
+| Variable | Notes |
+|----------|--------|
+| `NUXT_SESSION_PASSWORD` | Required |
+| `NUXT_MINISITE_API_BASE` | `https://minisite-roan.vercel.app` if using hosted minisite |
+| `NUXT_MINISITE_PUBLIC_API_KEY` | Optional — must match minisite `PUBLIC_API_KEY` when set |
+| `NUXT_AUTH_BYPASS` | `false` for real SAML |
+| `NUXT_SAML_IDP_SSO_URL` / `NUXT_SAML_IDP_CERT` | From IT when SSO is live |
 
-**Option A — Vercel minisite (default):** copy `SSO_BRIDGE_INTERNAL_KEY` from the minisite Vercel project into amplifai `NUXT_MINISITE_INTERNAL_KEY`. Keep `NUXT_MINISITE_API_BASE=https://minisite-roan.vercel.app`.
-
-**Option B — local minisite:** run minisite on port 3001 (`npm run dev -- -p 3001` in the minisite repo), set `NUXT_MINISITE_API_BASE=http://localhost:3001`, and either leave `SSO_BRIDGE_INTERNAL_KEY` unset on minisite (dev allows any key) or set matching keys on both repos.
-
-After changing minisite env vars, **restart amplifai** and **sign out + sign in** so the session gets a fresh `minisiteToken`.
-
-**Smoke test** (replace URL and key):
-
-```bash
-curl -X POST http://localhost:3001/api/auth/sso-bridge \
-  -H "Content-Type: application/json" \
-  -H "X-Internal-Key: YOUR_KEY" \
-  -d '{"email":"dev.user@loreal.com","firstName":"Dev","lastName":"User"}'
-```
-
-Expect `{ "success": true, "data": { "token": "...", "user": {...} } }`. A 401 here means key mismatch — fix env before using the app.
+**Protected participant routes** (`/api/minisite/me`, check-in, orders, QR redeem) still expect a **`minisiteToken`** on the amplifai session. That token is **not** set at sign-in anymore; full sparks profile and write flows need future minisite auth integration.
 
 My-schedule favorites stay in `localStorage` until minisite adds a schedule API.
 

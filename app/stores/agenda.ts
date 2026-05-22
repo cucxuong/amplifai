@@ -56,8 +56,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       fetched.value = true
     }
     catch (e) {
-      if (isUnauthorizedError(e))
-        useMinisiteStatus().markUnavailable()
       error.value = e instanceof Error ? e.message : 'Failed to load agenda'
     }
     finally {
