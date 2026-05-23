@@ -80,6 +80,33 @@ export const useCheckInStore = defineStore('checkIn', () => {
     }
   }
 
+  async function checkInBySessionId(sessionId: string): Promise<CheckInSuccess | null> {
+    loading.value = true
+    error.value = null
+    try {
+      const api = useApi()
+      const result = await api.post<MinisiteCheckInResult>('/api/minisite/check-in', { sessionId })
+      const agendaStore = useAgendaStore()
+      const item = agendaStore.items.find(i => i.id === sessionId)
+      const success: CheckInSuccess = {
+        title: result.sessionTitle,
+        sparks: result.sparksAwarded,
+        routeId: item?.id ?? sessionId,
+      }
+      lastSuccess.value = success
+      await useUserStore().fetchMe(true)
+      void agendaStore.fetchSessions(true)
+      return success
+    }
+    catch (e) {
+      error.value = e instanceof Error ? e.message : 'Check-in failed'
+      return null
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
   return {
     lastSuccess,
     loading,
@@ -87,5 +114,6 @@ export const useCheckInStore = defineStore('checkIn', () => {
     checkInByQr,
     redeemCampaignQr,
     redeemOrderByShortId,
+    checkInBySessionId,
   }
 })
