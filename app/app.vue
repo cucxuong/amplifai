@@ -29,7 +29,6 @@ watch(
   <div class="app-wrapper">
     <div
       class="page-route-host min-h-0 flex-1"
-      :class="{ invisible: !scrollPinReady }"
     >
       <NuxtLayout>
         <NuxtPage

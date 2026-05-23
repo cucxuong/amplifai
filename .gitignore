@@ -29,3 +29,4 @@ logs
 *.pem
 
 .vercel
+package-lock.json
