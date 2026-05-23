@@ -39,8 +39,22 @@ const isInMySchedule = computed(() =>
   item.value ? isInUserCalendar(item.value) : false,
 );
 
-function toggleSchedule() {
-  if (item.value) toggleUserSchedule(item.value.id);
+const isToggling = ref(false);
+
+async function toggleSchedule() {
+  if (!item.value || isToggling.value) return;
+
+  try {
+    isToggling.value = true;
+    await toggleUserSchedule(item.value.id);
+  }
+  catch (error) {
+    console.error('Failed to toggle schedule:', error);
+    // TODO: Show error toast/notification to user
+  }
+  finally {
+    isToggling.value = false;
+  }
 }
 
 function handleCheckIn() {
@@ -180,11 +194,12 @@ function handleCheckIn() {
         </UiCTAButton>
         <button
           type="button"
-          class="appearance-none outline-none! w-full py-2 text-center font-bold leading-6 active:opacity-70 transition-opacity select-none"
+          class="appearance-none outline-none! w-full py-2 text-center font-bold leading-6 active:opacity-70 transition-opacity select-none disabled:opacity-50"
           :class="isInMySchedule ? 'text-subtle' : 'text-primary'"
+          :disabled="isToggling"
           @click="toggleSchedule"
         >
-          {{ isInMySchedule ? "Remove from my schedule" : "Sign up and save to my schedule" }}
+          {{ isToggling ? "Saving..." : isInMySchedule ? "Remove from my schedule" : "Sign up and save to my schedule" }}
         </button>
       </AppBottomBar>
     </AppFixedBottom>

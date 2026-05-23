@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     const profile = await parseAcsResponse(body)
     const claims = mapSamlProfileToClaims(profile)
     const stored = await findOrCreateSamlUser(claims)
-    const payload = buildUserSessionPayload(stored)
+    const payload = await buildUserSessionPayload(stored)
     await setUserSession(event, payload)
     return sendRedirect(event, '/')
   }

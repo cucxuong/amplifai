@@ -1,31 +1,42 @@
 <script setup lang="ts">
-const activeAgendaTab = ref<'all' | 'my-schedule'>('all')
+const activeAgendaTab = ref<"all" | "my-schedule">("all");
 
 const AGENDA_DAYS = [
-  { day: 'TUE', date: '2026-06-02' },
-  { day: 'WED', date: '2026-06-03' },
-  { day: 'THU', date: '2026-06-04' },
-  { day: 'FRI', date: '2026-06-05' },
-  { day: 'ALWAYS ON BOOTH', date: null },
-] as const
+  { day: "TUE", date: "2026-06-02" },
+  { day: "WED", date: "2026-06-03" },
+  { day: "THU", date: "2026-06-04" },
+  { day: "FRI", date: "2026-06-05" },
+  { day: "ALWAYS ON BOOTH", date: null },
+] as const;
 
-const activeDate = ref<string>(AGENDA_DAYS[0].day)
+const activeDate = ref<string>(AGENDA_DAYS[0].day);
 
-const agendaStore = useAgendaStore()
-const { agendaItemsForView } = useAgendaSchedule()
+const agendaStore = useAgendaStore();
+const { agendaItemsForView } = useAgendaSchedule();
+const currentUserStore = useCurrentUserStore();
+
+// Sync schedule from backend when switching to "My schedule" tab
+watchEffect(async () => {
+  if (activeAgendaTab.value === "my-schedule") {
+    await currentUserStore.syncScheduleFromBackend();
+  }
+});
 
 const agendaItems = computed(() => {
-  // For "my-schedule" tab, show all saved items regardless of selected date
-  if (activeAgendaTab.value === 'my-schedule') {
-    return agendaItemsForView(activeAgendaTab.value, null) ?? []
-  }
-  // For "all" tab, filter by selected date
-  const date = activeDate.value === 'ALWAYS ON BOOTH' ? null : AGENDA_DAYS.find(day => day.day === activeDate.value)?.date
-  return agendaItemsForView(activeAgendaTab.value, date ?? null) ?? []
-})
+  // Get the selected date (or null for always-on booth)
+  const date =
+    activeDate.value === "ALWAYS ON BOOTH"
+      ? null
+      : AGENDA_DAYS.find((day) => day.day === activeDate.value)?.date;
+  // Apply date filter to both tabs
+  return agendaItemsForView(activeAgendaTab.value, date ?? null) ?? [];
+});
 
-const isLoading = computed(() => agendaStore.loading && !agendaStore.fetched)
-const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && agendaItems.value.length === 0)
+const isLoading = computed(() => agendaStore.loading && !agendaStore.fetched);
+const showEmpty = computed(
+  () =>
+    agendaStore.fetched && !agendaStore.error && agendaItems.value.length === 0,
+);
 </script>
 
 <template>
@@ -35,36 +46,55 @@ const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && ag
 
     <div class="flex flex-col gap-4 p-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-title capitalize">
-          Agenda
-        </h2>
+        <h2 class="text-title capitalize">Agenda</h2>
 
         <GlassPanel
           class="p-0.75 inline-grid grid-cols-2 items-center gap-0.5 rounded-[14px]"
-          style="background: linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)), rgb(255 255 255 / 0.1);"
+          style="
+            background:
+              linear-gradient(0deg, rgb(5 10 48 / 0.4), rgb(5 10 48 / 0.4)),
+              rgb(255 255 255 / 0.1);
+          "
         >
           <div
             class="rounded-[12px] p-2.5 px-4 grid place-content-center before:border-0"
-            :class="activeAgendaTab === 'all' ? 'glass-panel bg-primary text-surface' : ''"
+            :class="
+              activeAgendaTab === 'all'
+                ? 'glass-panel bg-primary text-surface'
+                : ''
+            "
             @click="activeAgendaTab = 'all'"
           >
-            <span :class="['text-label', { 'font-normal': activeAgendaTab !== 'all' }]">All events</span>
+            <span
+              :class="[
+                'text-label',
+                { 'font-normal': activeAgendaTab !== 'all' },
+              ]"
+              >All events</span
+            >
           </div>
           <div
             class="rounded-[12px] p-2.5 px-4 grid place-content-center before:border-0"
-            :class="activeAgendaTab === 'my-schedule' ? 'glass-panel bg-primary text-surface' : ''"
+            :class="
+              activeAgendaTab === 'my-schedule'
+                ? 'glass-panel bg-primary text-surface'
+                : ''
+            "
             @click="activeAgendaTab = 'my-schedule'"
           >
-            <span :class="['text-label', { 'font-normal': activeAgendaTab !== 'my-schedule' }]">My schedule</span>
+            <span
+              :class="[
+                'text-label',
+                { 'font-normal': activeAgendaTab !== 'my-schedule' },
+              ]"
+              >My schedule</span
+            >
           </div>
         </GlassPanel>
       </div>
 
       <div class="bg-white p-4 py-5 rounded-[28px] gap-7 flex flex-col">
         <!-- Show note when viewing "My schedule" across all days -->
-        <div v-if="activeAgendaTab === 'my-schedule'" class="text-center text-caption text-secondary">
-          Showing all sessions you saved
-        </div>
 
         <div class="flex *:flex-1 gap-2.5 overflow-x-auto">
           <button
@@ -73,8 +103,13 @@ const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && ag
             class="flex flex-col items-center justify-center text-center gap-1 p-2 rounded-xl font-bold uppercase"
             :class="[
               day.date ? 'aspect-square size-13' : 'h-13 px-2.5',
-              activeDate === day.day ? 'bg-[linear-gradient(135deg,#FF6E00,#FF003B)] *:text-primary' : 'bg-muted text-surface',
-              { 'invisible pointer-events-none': activeAgendaTab === 'my-schedule' && !day.date },
+              activeDate === day.day
+                ? 'bg-[linear-gradient(135deg,#FF6E00,#FF003B)] *:text-primary'
+                : 'bg-muted text-surface',
+              {
+                'invisible pointer-events-none':
+                  activeAgendaTab === 'my-schedule' && !day.date,
+              },
             ]"
             :inert="activeAgendaTab === 'my-schedule' && !day.date"
             @click="activeDate = day.day"
@@ -82,11 +117,14 @@ const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && ag
             <span
               v-if="day.date"
               class="text-[11px] leading-[14px] tracking-[0.22px] text-subtle"
-            >{{ day.day }}</span>
+              >{{ day.day }}</span
+            >
             <span
               v-else
               class="text-[11px] leading-[14px] tracking-[0.22px] min-w-max"
-            >ALWAYS <br> ON BOOTH</span>
+              >ALWAYS <br />
+              ON BOOTH</span
+            >
             <span v-if="day.date">{{ new Date(day.date).getDate() }}</span>
           </button>
         </div>

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = await findOrCreateDevMockUser()
-  const payload = buildUserSessionPayload(user)
+  const payload = await buildUserSessionPayload(user)
   await setUserSession(event, payload)
 
   return { ok: true as const }
