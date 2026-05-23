@@ -4,13 +4,10 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "postbuild": "node .cursor/scripts/verify-cf-build.mjs",
     "dev": "node .cursor/scripts/dev-https.mjs",
     "dev:http": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "pages:preview": "npm run build && wrangler pages dev dist --port 8788",
-    "pages:deploy": "npm run build && wrangler pages deploy dist",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
@@ -38,7 +35,6 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.0",
-    "typescript": "^6.0.3",
-    "wrangler": "^4.94.0"
+    "typescript": "^6.0.3"
   }
 }

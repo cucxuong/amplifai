@@ -12,7 +12,6 @@ const AGENDA_DAYS = [
 const activeDate = ref<string>(AGENDA_DAYS[0].day)
 
 const agendaStore = useAgendaStore()
-const currentUser = useCurrentUserStore()
 const { agendaItemsForView } = useAgendaSchedule()
 
 const agendaItems = computed(() => {
@@ -20,21 +19,7 @@ const agendaItems = computed(() => {
   return agendaItemsForView(activeAgendaTab.value, date ?? null) ?? []
 })
 
-// Loading states for different tabs
-const isLoadingAllEvents = computed(() => agendaStore.loading && !agendaStore.fetched)
-const isLoadingMySchedule = computed(() => {
-  // Show loading if sessions haven't fetched yet OR if schedule is being fetched
-  return (!agendaStore.fetched && agendaStore.loading) || currentUser.loading
-})
-
-// Determine which loading state to show based on active tab
-const isLoading = computed(() => {
-  if (activeAgendaTab.value === 'all') {
-    return isLoadingAllEvents.value
-  }
-  return isLoadingMySchedule.value
-})
-
+const isLoading = computed(() => agendaStore.loading && !agendaStore.fetched)
 const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && agendaItems.value.length === 0)
 </script>
 
@@ -100,11 +85,11 @@ const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && ag
           v-if="isLoading"
           class="py-10 text-center text-secondary text-label"
         >
-          {{ activeAgendaTab === 'all' ? 'Loading agenda…' : 'Loading your schedule…' }}
+          Loading agenda…
         </div>
 
         <div
-          v-else-if="agendaStore.error && activeAgendaTab === 'all'"
+          v-else-if="agendaStore.error"
           class="py-8 flex flex-col items-center gap-3"
         >
           <p class="text-caption text-secondary text-center">
@@ -114,22 +99,6 @@ const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && ag
             type="button"
             class="text-label font-bold text-primary underline"
             @click="agendaStore.fetchSessions(true)"
-          >
-            Retry
-          </button>
-        </div>
-
-        <div
-          v-else-if="currentUser.error && activeAgendaTab === 'my-schedule'"
-          class="py-8 flex flex-col items-center gap-3"
-        >
-          <p class="text-caption text-secondary text-center">
-            {{ currentUser.error }}
-          </p>
-          <button
-            type="button"
-            class="text-label font-bold text-primary underline"
-            @click="currentUser.fetchSchedule()"
           >
             Retry
           </button>

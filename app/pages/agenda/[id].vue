@@ -39,14 +39,8 @@ const isInMySchedule = computed(() =>
   item.value ? isInUserCalendar(item.value) : false,
 );
 
-async function toggleSchedule() {
-  if (!item.value) return
-  try {
-    await toggleUserSchedule(item.value.id)
-  }
-  catch (err) {
-    console.error('Failed to toggle schedule:', err)
-  }
+function toggleSchedule() {
+  if (item.value) toggleUserSchedule(item.value.id);
 }
 
 function handleCheckIn() {

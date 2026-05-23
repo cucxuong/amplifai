@@ -5,7 +5,6 @@
 .nitro
 .cache
 dist
-.wrangler/
 
 # Node dependencies
 node_modules
@@ -19,20 +18,14 @@ logs
 .fleet
 .idea
 .cursor
-!.cursor/scripts/
-!.cursor/scripts/verify-cf-build.mjs
 
 # Local env files
 .env
 .env.*
 !.env.example
-.dev.vars
-!.dev.vars.example
 
 # mkcert dev TLS (NUXT_DEV_HTTPS_KEY / NUXT_DEV_HTTPS_CERT)
 .cert/
 *.pem
 
 .vercel
-package-lock.json
-.claude

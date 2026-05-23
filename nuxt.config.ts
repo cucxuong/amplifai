@@ -116,9 +116,6 @@ export default defineNuxtConfig({
     ...(devHttpsEnabled && hasDevCertFiles()
       ? { server: { https: resolveDevHttps() } }
       : {}),
-    build: {
-      sourcemap: false,
-    },
   },
 
   modules: [
@@ -134,21 +131,6 @@ export default defineNuxtConfig({
 
   css: ['./app/assets/css/tailwind.css'],
 
-  nitro: {
-    preset: 'cloudflare-pages',
-    cloudflare: {
-      deployConfig: true,
-      nodeCompat: true,
-    },
-    // https://github.com/nitrojs/nitro/issues/3271
-    unenv: {
-      alias: {
-        'string_decoder/': 'node:string_decoder',
-        'process/': 'node:process',
-      },
-    },
-  },
-
   routeRules: {
     '/sign-up': { redirect: { to: '/sign-in', statusCode: 301 } },
     '/sign-up/verify-email': { redirect: { to: '/sign-in', statusCode: 301 } },
@@ -157,6 +139,7 @@ export default defineNuxtConfig({
   },
 
   app: {
+    baseURL: '/',
     head: {
       script: [
         {
