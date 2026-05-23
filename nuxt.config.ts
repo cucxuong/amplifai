@@ -144,8 +144,10 @@ export default defineNuxtConfig({
       script: [
         {
           key: 'app-scroll-pin',
-          innerHTML: `(function(){try{var s=getComputedStyle(document.documentElement);var t=parseFloat(s.getPropertyValue('--app-min-scroll-top'))||62;window.scrollTo(0,t);document.documentElement.classList.add('app-scroll-pinned')}catch(e){}})();`,
+          src: '/app-scroll-pin-init.js',
           tagPosition: 'head',
+          defer: false,
+          async: false,
         },
       ],
       link: [

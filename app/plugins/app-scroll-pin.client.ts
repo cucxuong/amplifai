@@ -1,12 +1,17 @@
-export default defineNuxtPlugin(() => {
-  const { ensureScrollPinned } = useAppScrollPin()
-  const router = useRouter()
+export default defineNuxtPlugin({
+  name: 'app-scroll-pin',
+  enforce: 'pre',
+  async setup() {
+    const { ensureScrollPinned, syncReadyFromDom } = useAppScrollPin()
+    const router = useRouter()
 
-  void ensureScrollPinned()
-
-  router.beforeEach(async (to, from) => {
-    if (to.path === from.path)
-      return
+    syncReadyFromDom()
     await ensureScrollPinned()
-  })
+
+    router.beforeEach(async (to, from) => {
+      if (to.path === from.path)
+        return
+      await ensureScrollPinned()
+    })
+  },
 })
