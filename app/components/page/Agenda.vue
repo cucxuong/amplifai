@@ -15,6 +15,11 @@ const agendaStore = useAgendaStore()
 const { agendaItemsForView } = useAgendaSchedule()
 
 const agendaItems = computed(() => {
+  // For "my-schedule" tab, show all saved items regardless of selected date
+  if (activeAgendaTab.value === 'my-schedule') {
+    return agendaItemsForView(activeAgendaTab.value, null) ?? []
+  }
+  // For "all" tab, filter by selected date
   const date = activeDate.value === 'ALWAYS ON BOOTH' ? null : AGENDA_DAYS.find(day => day.day === activeDate.value)?.date
   return agendaItemsForView(activeAgendaTab.value, date ?? null) ?? []
 })
@@ -56,6 +61,11 @@ const showEmpty = computed(() => agendaStore.fetched && !agendaStore.error && ag
       </div>
 
       <div class="bg-white p-4 py-5 rounded-[28px] gap-7 flex flex-col">
+        <!-- Show note when viewing "My schedule" across all days -->
+        <div v-if="activeAgendaTab === 'my-schedule'" class="text-center text-caption text-secondary">
+          Showing all sessions you saved
+        </div>
+
         <div class="flex *:flex-1 gap-2.5 overflow-x-auto">
           <button
             v-for="day in AGENDA_DAYS"
