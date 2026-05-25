@@ -51,8 +51,15 @@ export function useQrScanCheckIn(getSessionId?: () => string | undefined) {
       return true
     }
 
+    // For agenda session check-in
     if (!isInUserCalendar(result.target.id))
-      toggleSchedule(result.target.id)
+      await toggleSchedule(result.target.id)
+
+    // Call API to check in for the session
+    const success = await checkInStore.checkInBySessionId(result.target.id)
+    if (!success)
+      return false
+
     await navigateTo(`/checkin/${result.target.id}`)
     return true
   }
