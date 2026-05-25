@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { authErrorMessage, authErrorStatus } from '~/utils/auth-errors'
+import { authErrorMessage } from '~/utils/auth-errors'
 
 const route = useRoute()
+const { public: { authBypass } } = useRuntimeConfig()
 
 const isSubmitting = ref(false)
 const formError = ref<string | null>(null)
@@ -18,37 +19,34 @@ watch(
   { immediate: true },
 )
 
+async function signInWithMock() {
+  formError.value = null
+  isSubmitting.value = true
+  try {
+    await $fetch<{ ok: true }>('/api/auth/dev-session', { method: 'POST', credentials: 'include' })
+    const ok = await refreshAuthSession()
+    if (!ok) {
+      formError.value = 'Session could not be started. Try again.'
+      return
+    }
+    await navigateTo('/')
+  }
+  catch (err: unknown) {
+    formError.value = authErrorMessage(err, 'Mock sign-in failed. Try again.')
+  }
+  finally {
+    isSubmitting.value = false
+  }
+}
+
 async function signInWithMicrosoft() {
   formError.value = null
   isSubmitting.value = true
-
   try {
-    const devSession = await $fetch<{ ok: true }>('/api/auth/dev-session', {
-      method: 'POST',
-      credentials: 'include',
-    }).catch((err: unknown) => {
-      if (authErrorStatus(err) === 403)
-        return null
-      throw err
-    })
-
-    if (devSession) {
-      const ok = await refreshAuthSession()
-      if (!ok) {
-        formError.value = 'Session could not be started. Try again.'
-        return
-      }
-
-      await navigateTo('/')
-      return
-    }
-
-    await navigateTo('/api/auth/saml/login', { external: true })
+    await navigateTo('/api/auth/microsoft', { external: true })
   }
   catch (err: unknown) {
     formError.value = authErrorMessage(err, 'Microsoft sign-in failed. Try again.')
-  }
-  finally {
     isSubmitting.value = false
   }
 }
@@ -74,13 +72,26 @@ async function signInWithMicrosoft() {
         {{ formError }}
       </p>
 
+      <button
+        v-if="authBypass"
+        :disabled="isSubmitting"
+        class="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
+        @click="signInWithMock"
+      >
+        {{ isSubmitting ? 'Signing in…' : 'Sign in (dev mock)' }}
+      </button>
+
       <AuthMicrosoftButton
+        v-else
         :loading="isSubmitting"
         :disabled="isSubmitting"
         @click="signInWithMicrosoft"
       />
 
-      <div class="flex items-start gap-2">
+      <div
+        v-if="!authBypass"
+        class="flex items-start gap-2"
+      >
         <Icon
           name="amplif:alert-circle"
           :size="16"

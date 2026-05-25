@@ -1,4 +1,3 @@
-import type { Profile } from '@node-saml/node-saml'
 import { isValidEmail, normalizeEmail } from './auth.service'
 import {
   findUserByEmail,
@@ -19,76 +18,6 @@ export const DEV_MOCK_SSO_EMAIL = 'dev.user@loreal.com'
 
 const ALLOWED_EMAIL_DOMAIN = '@loreal.com'
 
-const EMAIL_CLAIM_KEYS = [
-  'email',
-  'mail',
-  'emailaddress',
-  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
-  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn',
-  'nameID',
-]
-
-const FIRST_NAME_CLAIM_KEYS = [
-  'givenName',
-  'firstname',
-  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
-]
-
-const LAST_NAME_CLAIM_KEYS = [
-  'surname',
-  'lastname',
-  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
-]
-
-const DISPLAY_NAME_CLAIM_KEYS = [
-  'displayName',
-  'name',
-  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name',
-]
-
-const OBJECT_ID_CLAIM_KEYS = [
-  'objectidentifier',
-  'objectId',
-  'http://schemas.microsoft.com/identity/claims/objectidentifier',
-]
-
-function claimValue(profile: Profile, keys: string[]): string {
-  for (const key of keys) {
-    const raw = profile[key]
-    if (typeof raw === 'string' && raw.trim())
-      return raw.trim()
-  }
-  return ''
-}
-
-function splitDisplayName(displayName: string): { firstName: string, lastName: string } {
-  const parts = displayName.trim().split(/\s+/)
-  if (parts.length === 0)
-    return { firstName: '', lastName: '' }
-  if (parts.length === 1)
-    return { firstName: parts[0]!, lastName: '' }
-  return {
-    firstName: parts[0]!,
-    lastName: parts.slice(1).join(' '),
-  }
-}
-
-export function mapSamlProfileToClaims(profile: Profile): SamlUserClaims {
-  const emailRaw = claimValue(profile, EMAIL_CLAIM_KEYS)
-  const email = normalizeEmail(emailRaw)
-
-  const displayName = claimValue(profile, DISPLAY_NAME_CLAIM_KEYS)
-  const fromDisplay = splitDisplayName(displayName)
-
-  const firstName = claimValue(profile, FIRST_NAME_CLAIM_KEYS) || fromDisplay.firstName
-  const lastName = claimValue(profile, LAST_NAME_CLAIM_KEYS) || fromDisplay.lastName
-
-  const externalId = claimValue(profile, OBJECT_ID_CLAIM_KEYS)
-    || profile.nameID?.trim()
-    || email
-
-  return { email, firstName, lastName, externalId }
-}
 
 function assertAllowedEmail(email: string): void {
   if (!isValidEmail(email)) {
