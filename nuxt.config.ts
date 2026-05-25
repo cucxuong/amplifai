@@ -141,6 +141,7 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/',
     head: {
+      title: 'AmplifAI Week - L\'Oréal',
       script: [
         {
           key: 'app-scroll-pin',
