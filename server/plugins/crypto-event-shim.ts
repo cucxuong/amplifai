@@ -1,9 +1,11 @@
 import crypto from 'node:crypto'
+import { EventEmitter } from 'node:events'
 
 /**
- * Cloudflare Workers' node:crypto returns Verify/Sign/Hash/Hmac objects whose
- * prototype chain is missing EventEmitter methods (removeAllListeners, on, emit, …).
- * xml-crypto (via @node-saml/node-saml) crashes on `this.removeAllListeners is not a function`.
+ * Cloudflare Workers' nodejs_compat exposes node:crypto and node:events, but the
+ * Verify/Sign/Hash objects (and in some cases EventEmitter itself) ship with
+ * incomplete prototypes — `removeAllListeners`, `on`, `emit` etc. are missing.
+ * xml-crypto and xml2js both crash on `this.removeAllListeners is not a function`.
  * Patch the prototypes once at boot.
  */
 export default defineNitroPlugin(() => {
@@ -26,20 +28,22 @@ export default defineNitroPlugin(() => {
     getMaxListeners: () => 10,
   }
 
-  const samples: unknown[] = []
-  try { samples.push(crypto.createVerify('sha256')) } catch { /* ignore */ }
-  try { samples.push(crypto.createSign('sha256')) } catch { /* ignore */ }
-  try { samples.push(crypto.createHash('sha256')) } catch { /* ignore */ }
-  try { samples.push(crypto.createHmac('sha256', 'k')) } catch { /* ignore */ }
+  const protos: unknown[] = [EventEmitter?.prototype]
+  try { protos.push(Object.getPrototypeOf(new EventEmitter())) } catch { /* ignore */ }
+  try { protos.push(Object.getPrototypeOf(crypto.createVerify('sha256'))) } catch { /* ignore */ }
+  try { protos.push(Object.getPrototypeOf(crypto.createSign('sha256'))) } catch { /* ignore */ }
+  try { protos.push(Object.getPrototypeOf(crypto.createHash('sha256'))) } catch { /* ignore */ }
+  try { protos.push(Object.getPrototypeOf(crypto.createHmac('sha256', 'k'))) } catch { /* ignore */ }
 
-  for (const sample of samples) {
-    if (!sample) continue
-    const proto = Object.getPrototypeOf(sample) as Record<string, unknown> | null
-    if (!proto) continue
+  const seen = new Set<unknown>()
+  for (const proto of protos) {
+    if (!proto || seen.has(proto)) continue
+    seen.add(proto)
+    const p = proto as Record<string, unknown>
     for (const [name, fn] of Object.entries(stubs)) {
-      if (typeof proto[name] !== 'function') {
+      if (typeof p[name] !== 'function') {
         try {
-          Object.defineProperty(proto, name, { value: fn, configurable: true, writable: true })
+          Object.defineProperty(p, name, { value: fn, configurable: true, writable: true })
         }
         catch { /* prototype frozen; skip */ }
       }
