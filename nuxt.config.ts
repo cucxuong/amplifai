@@ -108,6 +108,29 @@ export default defineNuxtConfig({
     },
   },
 
+  // Force bare Node.js core module imports (crypto, stream, events) to resolve to
+  // the node: prefixed externals so CF Workers uses its native nodejs_compat implementations
+  // instead of unenv polyfills. Without this, xml-crypto's crypto.createVerify() returns
+  // a stream object whose EventEmitter prototype chain is broken in the V8 isolate.
+  nitro: {
+    rollupConfig: {
+      plugins: [
+        {
+          name: 'native-node-modules',
+          resolveId(id: string) {
+            const map: Record<string, string> = {
+              crypto: 'node:crypto',
+              stream: 'node:stream',
+              events: 'node:events',
+              zlib: 'node:zlib',
+            }
+            if (map[id]) return { id: map[id], external: true }
+          },
+        },
+      ],
+    },
+  },
+
   // HTTPS: use `npm run dev` (.cursor/scripts/dev-https.mjs → nuxt --https).
   // mkcert files in .cert/ are passed via --https.key / --https.cert when present.
   vite: {
