@@ -13,6 +13,7 @@
     "lint:fix": "eslint --fix ."
   },
   "dependencies": {
+    "@node-saml/node-saml": "^5.1.0",
     "@nuxt/eslint": "^1.15.2",
     "@nuxt/fonts": "^0.14.0",
     "@nuxt/icon": "^2.2.2",

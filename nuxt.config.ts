@@ -95,13 +95,10 @@ export default defineNuxtConfig({
     minisiteApiBase: process.env.NUXT_MINISITE_API_BASE || 'https://minisite-roan.vercel.app',
     /** Optional; only when deployed minisite sets PUBLIC_API_KEY. */
     minisitePublicApiKey: process.env.NUXT_MINISITE_PUBLIC_API_KEY || '',
-    oauth: {
-      microsoft: {
-        clientId: process.env.AZURE_AD_CLIENT_ID || '',
-        clientSecret: process.env.AZURE_AD_CLIENT_SECRET || '',
-        tenant: process.env.AZURE_AD_TENANT_ID || '',
-      },
-    },
+    samlEntityId: process.env.NUXT_SAML_ENTITY_ID || '',
+    samlAcsUrl: process.env.NUXT_SAML_ACS_URL || '',
+    samlIdpSsoUrl: process.env.NUXT_SAML_IDP_SSO_URL || '',
+    samlIdpCert: process.env.NUXT_SAML_IDP_CERT || '',
     session: {
       cookie: {
         secure: sessionCookieSecure,

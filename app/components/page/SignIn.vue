@@ -43,7 +43,7 @@ async function signInWithMicrosoft() {
   formError.value = null
   isSubmitting.value = true
   try {
-    await navigateTo('/api/auth/microsoft', { external: true })
+    await navigateTo('/api/auth/saml/login', { external: true })
   }
   catch (err: unknown) {
     formError.value = authErrorMessage(err, 'Microsoft sign-in failed. Try again.')

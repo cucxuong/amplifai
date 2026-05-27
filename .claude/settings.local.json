@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(ls -la \"C:/Users/tlvu/\" | grep mcp; ls -la \"C:/Users/tlvu/.claude/\" | grep mcp)",
+      "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); const p=JSON.parse\\(d\\); console.log\\('version:', p.version\\); console.log\\('exports keys:', Object.keys\\(p.exports||{}\\).join\\(', '\\)\\)\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\tlvu\\\\Desktop\\\\Code\\\\minisite\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)"
+    ]
+  }
+}
