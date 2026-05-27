@@ -4,7 +4,11 @@ import { buildUserSessionPayload } from '../../../services/minisite/session.serv
 
 export default defineEventHandler(async (event) => {
   try {
-    const body = await readBody(event)
+    const raw = await readRawBody(event, 'utf-8') ?? ''
+    const params = new URLSearchParams(raw)
+    const body: Record<string, string> = {}
+    for (const [k, v] of params.entries()) body[k] = v
+
     const saml = getSamlInstance()
     const { profile } = await saml.validatePostResponseAsync(body)
 
