@@ -43,7 +43,13 @@ const formattedDescription = computed(() => {
   const raw =
     item.value?.description ??
     "Join us for this session at L'Oréal ONE SINGAPORE.";
-  return raw.replace(/\* /g, '\n');
+  return raw
+    .replace(/(?:\r?\n)?\* /g, '\n')
+    .replace(/\n{2,}/g, '\n')
+    .split('\n')
+    .map(line => line.trimEnd())
+    .join('\n')
+    .trim();
 });
 
 const isToggling = ref(false);
@@ -104,7 +110,7 @@ function handleCheckIn() {
       </h1>
 
       <!-- Description -->
-      <p class="text-secondary leading-relaxed text-[16px] whitespace-pre-line">
+      <p class="text-secondary leading-snug text-[16px] whitespace-pre-line">
         {{ formattedDescription }}
       </p>
 
