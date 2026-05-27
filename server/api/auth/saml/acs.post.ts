@@ -25,7 +25,8 @@ export default defineEventHandler(async (event) => {
     return sendRedirect(event, '/')
   }
   catch (err) {
-    console.error('[SAML ACS] error:', err)
+    const e = err as Error
+    console.error('[SAML ACS] error:', e?.name, e?.message, '\nstack:', e?.stack)
     return sendRedirect(event, '/sign-in?error=sso_failed')
   }
 })
