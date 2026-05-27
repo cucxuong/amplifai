@@ -62,6 +62,13 @@ const isPortrait = computed(() => height.value >= width.value)
         >
           Get started
         </UiCTAButton>
+        <NuxtLink
+          to="/privacy"
+          prefetch
+          class="block rounded-lg border border-white/25 bg-white/10 px-4 py-2.5 text-center text-sm font-bold text-primary active:opacity-80"
+        >
+          Read our Privacy Notice
+        </NuxtLink>
         <div class="text-center text-caption text-pretty text-subtle">
           INTERNAL · L'ORÉAL EMPLOYEES ONLY
         </div>

@@ -1,4 +1,4 @@
-const PUBLIC_PREFIXES = ['/sign-in']
+const PUBLIC_PREFIXES = ['/sign-in', '/privacy']
 export default defineNuxtRouteMiddleware((to) => {
   const { loggedIn } = useUserSession()
 

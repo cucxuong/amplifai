@@ -62,7 +62,7 @@ const personaImg = computed(() => {
           />
         </NuxtLink>
 
-        <div class="flex items-center gap-6 py-5">
+        <div class="flex items-center gap-6 py-5 border-b border-white/20">
           <span class="flex-1 font-bold text-base leading-5 text-primary">
             Notifications
           </span>
@@ -83,6 +83,21 @@ const personaImg = computed(() => {
             />
           </button>
         </div>
+
+        <NuxtLink
+          to="/privacy"
+          prefetch
+          class="flex items-center gap-6 py-5 text-primary active:opacity-80"
+        >
+          <span class="flex-1 font-bold text-base leading-5">
+            Privacy Notice
+          </span>
+          <Icon
+            name="amplif:arrow-right"
+            :size="24"
+            class="shrink-0"
+          />
+        </NuxtLink>
       </div>
     </div>
   </PageHomeContainer>

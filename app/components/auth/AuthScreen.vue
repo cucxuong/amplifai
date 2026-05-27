@@ -29,6 +29,13 @@ withDefaults(
         <span> Authentication via Azure AD.</span>
         <span> Session-only.</span>
         <span> Data deleted 30 days post-event.</span>
+        <NuxtLink
+          to="/privacy"
+          prefetch
+          class="ml-1 underline text-primary"
+        >
+          Read Privacy Notice
+        </NuxtLink>
       </div>
     </AppBottomBar>
   </div>
