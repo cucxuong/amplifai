@@ -49,9 +49,9 @@ const maxScore = computed(() =>
       <div class="text-caption text-secondary text-[16px]">
         Total earned {{ loading && !totalEarned ? "—" : totalEarned }} sparks
       </div>
-      <div class="text-caption text-secondary text-[16px] mt-1 italic">
-        *Once you collect 400 sparks, you will enter into a lucky draw. Draw will
-        be conducted in June and you will be contacted by HR if you are a
+      <div class="text-caption text-secondary text-[16px] mt-4 italic">
+        *Once you collect 400 sparks, you will enter into a lucky draw. Draw
+        will be conducted in June and you will be contacted by HR if you are a
         winner!
       </div>
     </div>
