@@ -39,17 +39,37 @@ const isInMySchedule = computed(() =>
   item.value ? isInUserCalendar(item.value) : false,
 );
 
+const SPEAKER_SECTION_LABEL = /^(speakers?|participants?)\s*:?\s*$/i;
+
+function formatAgendaDescription(raw: string): string {
+  const lines = raw
+    .replace(/(?:\r?\n)?\* /g, '\n')
+    .split(/\r?\n/)
+    .map(line => line.trimEnd());
+
+  const result: string[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    if (
+      result.length > 0
+      && SPEAKER_SECTION_LABEL.test(trimmed)
+      && result[result.length - 1] !== ''
+    ) {
+      result.push('');
+    }
+    result.push(line);
+  }
+
+  return result.join('\n');
+}
+
 const formattedDescription = computed(() => {
   const raw =
     item.value?.description ??
     "Join us for this session at L'Oréal ONE SINGAPORE.";
-  return raw
-    .replace(/(?:\r?\n)?\* /g, '\n')
-    .replace(/\n{2,}/g, '\n')
-    .split('\n')
-    .map(line => line.trimEnd())
-    .join('\n')
-    .trim();
+  return formatAgendaDescription(raw);
 });
 
 const isToggling = ref(false);
@@ -110,7 +130,7 @@ function handleCheckIn() {
       </h1>
 
       <!-- Description -->
-      <p class="text-secondary leading-snug text-[16px] whitespace-pre-line">
+      <p class="text-secondary text-[16px] leading-[1.6] whitespace-pre-line">
         {{ formattedDescription }}
       </p>
 
