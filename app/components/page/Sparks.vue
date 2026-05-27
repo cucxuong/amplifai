@@ -1,14 +1,14 @@
 <script setup lang="ts">
-const { activities, currentScore, totalEarned, rank, loading, error, refresh } = useSparks()
+const { activities, currentScore, totalEarned, rank, loading, error, refresh } =
+  useSparks();
 
-const maxScore = computed(() => Math.max(totalEarned.value, currentScore.value, 1))
+const maxScore = computed(() =>
+  Math.max(totalEarned.value, currentScore.value, 1),
+);
 </script>
 
 <template>
-  <div
-    id="sparks-page"
-    class="page-content h-full min-h-0 flex flex-col"
-  >
+  <div id="sparks-page" class="page-content h-full min-h-0 flex flex-col">
     <div class="flex flex-col shrink-0 px-5 pb-8">
       <AppTopBar class="px-0">
         <UiBackButton fallback="/agenda" />
@@ -20,13 +20,11 @@ const maxScore = computed(() => Math.max(totalEarned.value, currentScore.value, 
         class="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-full mt-14 mb-5"
         style="background: linear-gradient(135deg, #ff6e00 0%, #ff003b 100%)"
       >
-        <NuxtImg
-          src="/rank-star.png"
-          class="size-6 object-contain"
-        />
+        <NuxtImg src="/rank-star.png" class="size-6 object-contain" />
         <span
           class="text-caption uppercase tracking-wide font-black text-[14px]"
-        >Rank #{{ loading && !currentScore ? '—' : (rank ?? '—') }}</span>
+          >Rank #{{ loading && !currentScore ? "—" : (rank ?? "—") }}</span
+        >
       </div>
 
       <div
@@ -36,16 +34,12 @@ const maxScore = computed(() => Math.max(totalEarned.value, currentScore.value, 
       </div>
 
       <div class="flex items-center gap-2 mb-2">
-        <span
-          class="font-bold leading-none"
-          style="font-size: 42px"
-        >{{
-          loading && !currentScore ? '—' : currentScore
+        <span class="font-bold leading-none" style="font-size: 42px">{{
+          loading && !currentScore ? "—" : currentScore
         }}</span>
-        <span
-          class="text-secondary leading-none"
-          style="font-size: 42px"
-        >/{{ maxScore }}</span>
+        <span class="text-secondary leading-none" style="font-size: 42px"
+          >/{{ maxScore }}</span
+        >
         <NuxtImg
           src="/activity-star.png"
           class="size-10 object-cover shrink-0"
@@ -53,7 +47,12 @@ const maxScore = computed(() => Math.max(totalEarned.value, currentScore.value, 
       </div>
 
       <div class="text-caption text-secondary text-[16px]">
-        Total earned {{ loading && !totalEarned ? '—' : totalEarned }} sparks
+        Total earned {{ loading && !totalEarned ? "—" : totalEarned }} sparks
+      </div>
+      <div class="text-caption text-secondary text-[16px]">
+        Once you collect 400 sparks, you will enter into a lucky draw. Draw will
+        be conducted in June and you will be contacted by HR if you are a
+        winner!
       </div>
     </div>
 
@@ -69,10 +68,7 @@ const maxScore = computed(() => Math.max(totalEarned.value, currentScore.value, 
         Loading activity…
       </div>
 
-      <div
-        v-else-if="error"
-        class="py-8 flex flex-col items-center gap-3"
-      >
+      <div v-else-if="error" class="py-8 flex flex-col items-center gap-3">
         <p class="text-caption text-secondary text-center">
           {{ error }}
         </p>
@@ -92,10 +88,7 @@ const maxScore = computed(() => Math.max(totalEarned.value, currentScore.value, 
         No activity yet — check in to sessions to earn Sparks.
       </p>
 
-      <div
-        v-else
-        class="flex flex-col"
-      >
+      <div v-else class="flex flex-col">
         <div
           v-for="item in activities"
           :key="item.id"
@@ -107,10 +100,7 @@ const maxScore = computed(() => Math.max(totalEarned.value, currentScore.value, 
               background: linear-gradient(135deg, #e8f0ff 0%, #c7daff 100%);
             "
           >
-            <NuxtImg
-              src="/activity-star.png"
-              class="size-10 object-cover"
-            />
+            <NuxtImg src="/activity-star.png" class="size-10 object-cover" />
           </div>
 
           <div class="flex flex-col flex-1 min-w-0 gap-0.5">
@@ -137,20 +127,14 @@ const maxScore = computed(() => Math.max(totalEarned.value, currentScore.value, 
               "
             >
               <span>+{{ item.sparks }}</span>
-              <NuxtImg
-                src="/ai-colored.svg"
-                class="size-4 object-cover"
-              />
+              <NuxtImg src="/ai-colored.svg" class="size-4 object-cover" />
             </div>
             <div
               v-else
               class="flex items-center gap-0.5 font-bold text-[14px] leading-[18px] text-[#FF003B]"
             >
               <span>{{ item.sparks }}</span>
-              <NuxtImg
-                src="/ai-colored.svg"
-                class="size-4 object-cover"
-              />
+              <NuxtImg src="/ai-colored.svg" class="size-4 object-cover" />
             </div>
             <span class="text-caption text-[#0B0F17]">Sparks</span>
           </div>
