@@ -39,6 +39,13 @@ const isInMySchedule = computed(() =>
   item.value ? isInUserCalendar(item.value) : false,
 );
 
+const formattedDescription = computed(() => {
+  const raw =
+    item.value?.description ??
+    "Join us for this session at L'Oréal ONE SINGAPORE.";
+  return raw.replace(/\* /g, '\n');
+});
+
 const isToggling = ref(false);
 
 async function toggleSchedule() {
@@ -92,16 +99,13 @@ function handleCheckIn() {
       </div>
 
       <!-- Title -->
-      <h1 class="text-[2rem] leading-[1.15] font-bold text-tertiary">
+      <h1 class="text-[1.8rem] leading-[1.15] font-bold text-tertiary">
         {{ item.title }}
       </h1>
 
       <!-- Description -->
-      <p class="text-secondary leading-relaxed text-[16px]">
-        {{
-          item.description ??
-            "Join us for this session at L'Oréal ONE SINGAPORE."
-        }}
+      <p class="text-secondary leading-relaxed text-[16px] whitespace-pre-line">
+        {{ formattedDescription }}
       </p>
 
       <!-- Sparks badge — cyan/electric-blue matching Figma -->
