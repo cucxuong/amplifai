@@ -6,7 +6,7 @@ const AGENDA_DAYS = [
   { day: "WED", date: "2026-06-03" },
   { day: "THU", date: "2026-06-04" },
   { day: "FRI", date: "2026-06-05" },
-  { day: "ALWAYS ON BOOTH", date: null },
+  { day: "ENGAGEMENT BOOTHS", date: null },
 ] as const;
 
 const activeDate = ref<string>(AGENDA_DAYS[0].day);
@@ -25,7 +25,7 @@ watchEffect(async () => {
 const agendaItems = computed(() => {
   // Get the selected date (or null for always-on booth)
   const date =
-    activeDate.value === "ALWAYS ON BOOTH"
+    activeDate.value === "ENGAGEMENT BOOTHS"
       ? null
       : AGENDA_DAYS.find((day) => day.day === activeDate.value)?.date;
   // Apply date filter to both tabs
@@ -122,8 +122,8 @@ const showEmpty = computed(
             <span
               v-else
               class="text-[11px] leading-[14px] tracking-[0.22px] min-w-max"
-              >ALWAYS <br />
-              ON BOOTH</span
+              >ENGAGEMENT <br />
+              BOOTHS</span
             >
             <span v-if="day.date">{{ new Date(day.date).getDate() }}</span>
           </button>
