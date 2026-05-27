@@ -39,7 +39,7 @@ const isInMySchedule = computed(() =>
   item.value ? isInUserCalendar(item.value) : false,
 );
 
-const SPEAKER_SECTION_LABEL = /^(speakers?|participants?)\s*:?\s*$/i;
+const SPEAKER_SECTION_LABEL = /^(speakers?|participants?|hosts?|Speakers?|Participants?|Hosts?)\s*:?\s*$/i;
 
 function formatAgendaDescription(raw: string): string {
   const lines = raw
