@@ -18,34 +18,19 @@ async function getMinisiteToken(user: StoredUser): Promise<string | undefined> {
   const devPassword = 'test-password-123'
 
   try {
-    // Try to login on minisite first
-    const loginResponse = await $fetch<MinisiteAuthResponse>(
-      `${minisiteBase}/api/auth/login`,
-      {
+    const [loginResponse, registerResponse] = await Promise.all([
+      $fetch<MinisiteAuthResponse>(`${minisiteBase}/api/auth/login`, {
         method: 'POST',
-        body: {
-          email: user.email,
-          password: devPassword,
-        },
-      },
-    ).catch(() => null)
+        body: { email: user.email, password: devPassword },
+      }).catch(() => null),
+      $fetch<MinisiteAuthResponse>(`${minisiteBase}/api/auth/register`, {
+        method: 'POST',
+        body: { email: user.email, firstName: user.firstName, lastName: user.lastName, password: devPassword },
+      }).catch(() => null),
+    ])
 
     if (loginResponse?.success && loginResponse.data?.token)
       return loginResponse.data.token
-
-    // If login fails, try to register
-    const registerResponse = await $fetch<MinisiteAuthResponse>(
-      `${minisiteBase}/api/auth/register`,
-      {
-        method: 'POST',
-        body: {
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          password: devPassword,
-        },
-      },
-    ).catch(() => null)
 
     if (registerResponse?.success && registerResponse.data?.token)
       return registerResponse.data.token
