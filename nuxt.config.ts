@@ -99,6 +99,8 @@ export default defineNuxtConfig({
     samlAcsUrl: process.env.NUXT_SAML_ACS_URL || '',
     samlIdpSsoUrl: process.env.NUXT_SAML_IDP_SSO_URL || '',
     samlIdpCert: process.env.NUXT_SAML_IDP_CERT || '',
+    samlDisableRequestedAuthnContext: envFlag('NUXT_SAML_DISABLE_REQUESTED_AUTHN_CONTEXT', true),
+    samlForceAuthn: envFlag('NUXT_SAML_FORCE_AUTHN', false),
     session: {
       cookie: {
         secure: sessionCookieSecure,

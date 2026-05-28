@@ -21,6 +21,8 @@ export function getSamlInstance(): SAML {
     entryPoint: idpSsoUrl,
     issuer: config.samlEntityId as string,
     idpCert: normalizeCert(idpCert),
+    disableRequestedAuthnContext: Boolean(config.samlDisableRequestedAuthnContext),
+    forceAuthn: Boolean(config.samlForceAuthn),
     wantAuthnResponseSigned: false,
   })
 
